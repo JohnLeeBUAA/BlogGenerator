@@ -1,0 +1,125 @@
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:mo="http://schemas.microsoft.com/office/mac/office/2008/main" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mv="urn:schemas-microsoft-com:mac:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" mc:Ignorable="w14 wp14">
+    <w:body>
+        <w:p w14:paraId="3B7ED9F7" w14:textId="3A87BE64" w:rsidR="006C3AF0" w:rsidRPr="0013007B" w:rsidRDefault="006E7C11">
+            <w:pPr>
+                <w:rPr>
+                    <w:b/>
+                </w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr>
+                    <w:b/>
+                </w:rPr>
+                <w:t>TrustPoint in the c</w:t>
+            </w:r>
+            <w:r w:rsidR="00383D52" w:rsidRPr="0013007B">
+                <w:rPr>
+                    <w:b/>
+                </w:rPr>
+                <w:t>ommunity</w:t>
+            </w:r>
+        </w:p>
+
+        <w:p w14:paraId="0C7CA4B7" w14:textId="77777777" w:rsidR="00383D52" w:rsidRDefault="00383D52"/>
+
+        <w:p w14:paraId="24C7ABA4" w14:textId="0C72A5B0" w:rsidR="00383D52" w:rsidRDefault="00383D52">
+            <w:r>
+                <w:t xml:space="preserve">Scott and Sherry Vanstone started TrustPoint Innovation because they </w:t>
+            </w:r>
+            <w:r w:rsidR="006E7C11">
+                <w:t>wanted</w:t>
+            </w:r>
+            <w:r>
+                <w:t xml:space="preserve"> </w:t>
+            </w:r>
+            <w:r w:rsidR="006E7C11">
+                <w:t xml:space="preserve">to </w:t>
+            </w:r>
+            <w:r>
+                <w:t xml:space="preserve">make a difference in the world. </w:t>
+            </w:r>
+            <w:r w:rsidR="006E7C11">
+                <w:t xml:space="preserve">As the saying goes, “think globally and act locally”. With that in mind, the TrustPoint team likes to </w:t>
+            </w:r>
+            <w:r>
+                <w:t xml:space="preserve">get out and be involved in our </w:t>
+            </w:r>
+            <w:r w:rsidR="006E7C11">
+                <w:t>local</w:t>
+            </w:r>
+            <w:r>
+                <w:t xml:space="preserve"> community.</w:t>
+            </w:r>
+        </w:p>
+
+        <w:p w14:paraId="1B107E09" w14:textId="77777777" w:rsidR="00383D52" w:rsidRDefault="00383D52"/>
+
+        <w:p w14:paraId="62BFCF5F" w14:textId="012ABC13" w:rsidR="00383D52" w:rsidRPr="0013007B" w:rsidRDefault="00383D52">
+            <w:pPr>
+                <w:rPr>
+                    <w:b/>
+                </w:rPr>
+            </w:pPr>
+            <w:r w:rsidRPr="0013007B">
+                <w:rPr>
+                    <w:b/>
+                </w:rPr>
+                <w:t>Making a</w:t>
+            </w:r>
+            <w:r w:rsidR="006E7C11">
+                <w:rPr>
+                    <w:b/>
+                </w:rPr>
+                <w:t xml:space="preserve"> d</w:t>
+            </w:r>
+            <w:r w:rsidRPr="0013007B">
+                <w:rPr>
+                    <w:b/>
+                </w:rPr>
+                <w:t>ifference – United Way Day of Caring</w:t>
+            </w:r>
+        </w:p>
+
+        <w:p w14:paraId="738360E0" w14:textId="77777777" w:rsidR="00383D52" w:rsidRDefault="00383D52"/>
+
+        <w:p w14:paraId="326AD0A4" w14:textId="77777777" w:rsidR="006E7C11" w:rsidRDefault="00383D52">
+            <w:r>
+                <w:t xml:space="preserve">There’s nothing better than </w:t>
+            </w:r>
+            <w:r w:rsidR="006E7C11">
+                <w:t>combining</w:t>
+            </w:r>
+            <w:r>
+                <w:t xml:space="preserve"> giving to the community and having fun. On June 3, the TrustPoint team took part in the </w:t>
+            </w:r>
+
+            <w:hyperlink r:id="rId5" w:history="1">
+                <w:r w:rsidRPr="00383D52">
+                    <w:rPr>
+                        <w:rStyle w:val="Hyperlink"/>
+                    </w:rPr>
+                    <w:t>7</w:t>
+                </w:r>
+                <w:r w:rsidRPr="00383D52">
+                    <w:rPr>
+                        <w:rStyle w:val="Hyperlink"/>
+                        <w:vertAlign w:val="superscript"/>
+                    </w:rPr>
+                    <w:t>th</w:t>
+                </w:r>
+                <w:r w:rsidRPr="00383D52">
+                    <w:rPr>
+                        <w:rStyle w:val="Hyperlink"/>
+                    </w:rPr>
+                    <w:t xml:space="preserve"> Annual United Way Day of Caring</w:t>
+                </w:r>
+            </w:hyperlink>
+
+            <w:r>
+                <w:t xml:space="preserve">. </w:t>
+            </w:r>
+        </w:p>
+
+        <w:p w14:paraId="238AEF00" w14:textId="77777777" w:rsidR="006E7C11" w:rsidRDefault="006E7C11"/>
+
+        <w:p w14:paraId="12286AC3" w14:textId="02ABB1E7" w:rsidR="00383D52" w:rsidRDefault="006E7C11"><w:r><w:t xml:space="preserve">The TrustPoint team was paired with </w:t></w:r><w:hyperlink r:id="rId6" w:history="1"><w:r w:rsidRPr="00383D52"><w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr><w:t>OneRoof</w:t></w:r></w:hyperlink><w:r><w:t xml:space="preserve"> – an important organization that offers shelter, services and support for homeless youth in our community. </w:t></w:r><w:r w:rsidR="00383D52"><w:t>We brushed up on our painting skills and gave</w:t></w:r><w:r><w:t xml:space="preserve"> their youth facility</w:t></w:r><w:r w:rsidR="00383D52"><w:t xml:space="preserve"> </w:t></w:r><w:r><w:t>in Kitchener a fresh new look</w:t></w:r><w:r w:rsidR="00383D52"><w:t xml:space="preserve">. </w:t></w:r></w:p><w:p w14:paraId="2A8E910A" w14:textId="77777777" w:rsidR="00F13AAE" w:rsidRDefault="00F13AAE"/><w:p w14:paraId="3A5F05F3" w14:textId="7A80EBCC" w:rsidR="00F13AAE" w:rsidRPr="0013007B" w:rsidRDefault="006E7C11"><w:pPr><w:rPr><w:b/></w:rPr></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>Connecting through p</w:t></w:r><w:r w:rsidR="00F13AAE" w:rsidRPr="0013007B"><w:rPr><w:b/></w:rPr><w:t>lay</w:t></w:r></w:p><w:p w14:paraId="6A740288" w14:textId="77777777" w:rsidR="00F13AAE" w:rsidRDefault="00F13AAE"/><w:p w14:paraId="7F9211A4" w14:textId="600D8072" w:rsidR="00F13AAE" w:rsidRDefault="00F13AAE"><w:r><w:t xml:space="preserve">TrustPoint has enjoyed a long and </w:t></w:r><w:r w:rsidR="006E7C11"><w:t>excellent</w:t></w:r><w:r><w:t xml:space="preserve"> relationship with the University of Waterloo. Many graduates from UW Math and Computer Science have fond memories of taking courses</w:t></w:r><w:r w:rsidR="006E7C11"><w:t xml:space="preserve"> with Dr. Scott Vanstone</w:t></w:r><w:r><w:t xml:space="preserve">. </w:t></w:r></w:p><w:p w14:paraId="21BBB28C" w14:textId="77777777" w:rsidR="00F13AAE" w:rsidRDefault="00F13AAE"/><w:p w14:paraId="75FF1E03" w14:textId="77777777" w:rsidR="006E7C11" w:rsidRDefault="00F13AAE"><w:r><w:t xml:space="preserve">Our relationship with UW continues today through research, offering work experience through co-op work terms and </w:t></w:r><w:r w:rsidR="006E7C11"><w:t>partnering on projects</w:t></w:r><w:r><w:t xml:space="preserve">. </w:t></w:r></w:p><w:p w14:paraId="4EA3E271" w14:textId="77777777" w:rsidR="006E7C11" w:rsidRDefault="006E7C11"/><w:p w14:paraId="38BD62FA" w14:textId="572F5A31" w:rsidR="00F13AAE" w:rsidRDefault="00F13AAE"><w:r><w:t xml:space="preserve">One of our favourite ways to stay involved with UW is through the David Johnston Research &amp; Technology Beach Volleyball League. The league gives members of the team a chance to stay fit and meet other great people </w:t></w:r><w:r w:rsidR="00E6545A"><w:t xml:space="preserve">working in the Waterloo tech community. </w:t></w:r></w:p><w:p w14:paraId="548ADA8C" w14:textId="77777777" w:rsidR="00E6545A" w:rsidRDefault="00E6545A"/><w:p w14:paraId="6DEF22DE" w14:textId="77777777" w:rsidR="00E6545A" w:rsidRDefault="00E6545A"><w:r><w:t>Our moves aren’t always great, but we know how to have fun.</w:t></w:r></w:p><w:p w14:paraId="0A19A214" w14:textId="77777777" w:rsidR="00E6545A" w:rsidRDefault="00E6545A"/><w:p w14:paraId="1059E86A" w14:textId="2AA5D731" w:rsidR="00734CDF" w:rsidRPr="0013007B" w:rsidRDefault="006E7C11"><w:pPr><w:rPr><w:b/></w:rPr></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>Supporting those who help o</w:t></w:r><w:r w:rsidR="0013007B" w:rsidRPr="0013007B"><w:rPr><w:b/></w:rPr><w:t>thers</w:t></w:r></w:p><w:p w14:paraId="6435E1E1" w14:textId="77777777" w:rsidR="0013007B" w:rsidRDefault="0013007B"/><w:p w14:paraId="0227577F" w14:textId="5A8633F9" w:rsidR="0013007B" w:rsidRDefault="0013007B"><w:r><w:t xml:space="preserve">The Milton District Health Centre holds a place close to our hearts at TrustPoint. We’re proud to support </w:t></w:r><w:hyperlink r:id="rId7" w:history="1"><w:r w:rsidRPr="0013007B"><w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr><w:t>a benefit concert in Scott’s memory</w:t></w:r></w:hyperlink><w:r><w:t xml:space="preserve"> on September 17, 2016</w:t></w:r><w:r w:rsidR="008D28BD"><w:t>,</w:t></w:r><w:r><w:t xml:space="preserve"> at 8:00 pm at the Milton Centre for the Arts. </w:t></w:r></w:p><w:p w14:paraId="3A54660C" w14:textId="77777777" w:rsidR="0013007B" w:rsidRDefault="0013007B"/><w:p w14:paraId="52DBBC11" w14:textId="346213FA" w:rsidR="0013007B" w:rsidRDefault="0013007B"><w:r><w:t>The evening</w:t></w:r><w:r w:rsidR="00A97005"><w:t xml:space="preserve"> will</w:t></w:r><w:r><w:t xml:space="preserve"> </w:t></w:r><w:r w:rsidR="00A97005"><w:t>feature</w:t></w:r><w:r><w:t xml:space="preserve"> thrilling and beautiful violin music like you’</w:t></w:r><w:r w:rsidR="00A97005"><w:t xml:space="preserve">ve heard before. It will seriously rock you. All proceeds will be used </w:t></w:r><w:r><w:t xml:space="preserve">for purchasing equipment for the expansion of the hospital. </w:t></w:r></w:p><w:p w14:paraId="52CAC39F" w14:textId="77777777" w:rsidR="0013007B" w:rsidRDefault="0013007B"/><w:p w14:paraId="47BF96BC" w14:textId="3D6F4278" w:rsidR="0013007B" w:rsidRDefault="00A97005"><w:r><w:t xml:space="preserve">Please join us on September 17. </w:t></w:r><w:r w:rsidR="0013007B"><w:t xml:space="preserve">Tickets can be purchased through the </w:t></w:r><w:hyperlink r:id="rId8" w:history="1"><w:r w:rsidR="0013007B" w:rsidRPr="0013007B"><w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr><w:t>Milton Centre for the Arts</w:t></w:r></w:hyperlink><w:r w:rsidR="0013007B"><w:t>.</w:t></w:r></w:p><w:p w14:paraId="3178A98A" w14:textId="77777777" w:rsidR="009764C2" w:rsidRDefault="009764C2"/><w:p w14:paraId="7D0CD451" w14:textId="77777777" w:rsidR="009764C2" w:rsidRDefault="009764C2"/><w:p w14:paraId="1C067A53" w14:textId="288934C3" w:rsidR="0013007B" w:rsidRPr="009764C2" w:rsidRDefault="00A97005"><w:pPr><w:rPr><w:b/></w:rPr></w:pPr><w:r w:rsidRPr="009764C2"><w:rPr><w:b/></w:rPr><w:t>Encouraging Others through Mentorship</w:t></w:r></w:p><w:p w14:paraId="31A52BAC" w14:textId="77777777" w:rsidR="00A97005" w:rsidRDefault="00A97005"/><w:p w14:paraId="1EB523A2" w14:textId="5F7A0E21" w:rsidR="00A97005" w:rsidRDefault="00A97005"><w:r><w:t xml:space="preserve">Women are playing a larger role in science, engineering and technology. The best way to ensure more women are encouraged to study science and mathematics is to provide them with mentorship and </w:t></w:r><w:r w:rsidR="0002645E"><w:t>role models.</w:t></w:r></w:p><w:p w14:paraId="249ABE0F" w14:textId="77777777" w:rsidR="0002645E" w:rsidRDefault="0002645E"/><w:p w14:paraId="687CE92B" w14:textId="4BCD9CC2" w:rsidR="0002645E" w:rsidRDefault="0002645E"><w:r><w:t>Nevine Ebeid, TrustPoint’s Principal Engineer, is actively involved in mentoring young women in high school Through her church’s youth group and school career days, Nevine exposes young women (and men) to the opportunities available to them in sciences.</w:t></w:r><w:r w:rsidR="006E7C11"><w:t xml:space="preserve"> Nevine was recognized for her important contributions with a nomination for </w:t></w:r><w:r w:rsidR="00B40ABA"><w:t xml:space="preserve">a </w:t></w:r><w:hyperlink r:id="rId9" w:history="1"><w:r w:rsidR="00B40ABA" w:rsidRPr="00B40ABA"><w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr><w:t>WOW the World Waterloo Region Award</w:t></w:r></w:hyperlink><w:r w:rsidR="00B40ABA"><w:t>.</w:t></w:r></w:p><w:p w14:paraId="07AE56B8" w14:textId="77777777" w:rsidR="0002645E" w:rsidRDefault="0002645E"/><w:p w14:paraId="2E28987D" w14:textId="27D3570C" w:rsidR="00B82252" w:rsidRDefault="0002645E"><w:r><w:t>Our CEO, Sherry Shannon-Vanstone is often asked to provide her insight and advice to fellow entrepreneurs. Sherry was recently selected to be part of the Cisco Women’s Entrepreneur Circle.</w:t></w:r><w:r w:rsidR="00B82252"><w:t xml:space="preserve"> This program bring</w:t></w:r><w:r w:rsidR="008D28BD"><w:t>s</w:t></w:r><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:bookmarkEnd w:id="0"/><w:r w:rsidR="00B82252"><w:t xml:space="preserve"> together women of influence who run small and medium-sized businesses across Canada. The goal is to help like-minded individuals to connect on their journey to success.</w:t></w:r></w:p><w:p w14:paraId="3ADA612F" w14:textId="77777777" w:rsidR="00B82252" w:rsidRDefault="00B82252"/><w:p w14:paraId="66CF274E" w14:textId="7A212AEC" w:rsidR="00B82252" w:rsidRDefault="00B82252"><w:r><w:t>We’re hoping to help one young woman better understand her career options through the Cisco Internship Program. Joyce Liu, who has just completed her second year at the University of Waterloo, has joined us as a summer intern. Joyce will have a chance to gain real-world ex</w:t></w:r><w:r w:rsidR="00B40ABA"><w:t>perience working on TrustPoint machine-to-machine (M</w:t></w:r><w:r><w:t>2M</w:t></w:r><w:r w:rsidR="00B40ABA"><w:t>)</w:t></w:r><w:r><w:t xml:space="preserve"> security. </w:t></w:r></w:p><w:p w14:paraId="1776AA76" w14:textId="77777777" w:rsidR="00B82252" w:rsidRDefault="00B82252"/><w:p w14:paraId="56DE444F" w14:textId="00873FA2" w:rsidR="00B82252" w:rsidRPr="009764C2" w:rsidRDefault="009764C2"><w:pPr><w:rPr><w:b/></w:rPr></w:pPr><w:r w:rsidRPr="009764C2"><w:rPr><w:b/></w:rPr><w:t>Find a way to get involved today</w:t></w:r></w:p><w:p w14:paraId="097D1E1D" w14:textId="77777777" w:rsidR="00B82252" w:rsidRDefault="00B82252"/><w:p w14:paraId="65788C14" w14:textId="66DC2DBB" w:rsidR="00B40ABA" w:rsidRDefault="009764C2"><w:r><w:t xml:space="preserve">Getting involved and serving our community helps us to give back and </w:t></w:r><w:r w:rsidR="008D28BD"><w:t>make a difference locally. As a</w:t></w:r><w:r><w:t xml:space="preserve"> bonus, it provides our team with a lot of satisfaction.</w:t></w:r></w:p><w:p w14:paraId="6E855F5E" w14:textId="77777777" w:rsidR="00B40ABA" w:rsidRDefault="00B40ABA"/><w:p w14:paraId="5FA0DD53" w14:textId="0DA888B8" w:rsidR="009764C2" w:rsidRDefault="0074482E"><w:r><w:t>Find a way to get involved in your community. The smallest gesture can make a world of difference.</w:t></w:r></w:p><w:p w14:paraId="2C1B9241" w14:textId="77777777" w:rsidR="00B82252" w:rsidRDefault="00B82252"/><w:p w14:paraId="58E5E1D3" w14:textId="666EB07A" w:rsidR="0002645E" w:rsidRDefault="0002645E"><w:r><w:t xml:space="preserve"> </w:t></w:r></w:p><w:p w14:paraId="3F8F7554" w14:textId="77777777" w:rsidR="0013007B" w:rsidRDefault="0013007B"><w:r><w:t xml:space="preserve"> </w:t></w:r></w:p><w:sectPr w:rsidR="0013007B" w:rsidSect="00012AD1"><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1800" w:bottom="1440" w:left="1800" w:header="708" w:footer="708" w:gutter="0"/><w:cols w:space="708"/><w:docGrid w:linePitch="360"/></w:sectPr></w:body></w:document>
