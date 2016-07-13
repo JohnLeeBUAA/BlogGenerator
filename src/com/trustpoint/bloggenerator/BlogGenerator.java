@@ -47,7 +47,7 @@ public class BlogGenerator extends JFrame
         initUploadFrame();
     }
 
-    public void initUploadFrame()
+    private void initUploadFrame()
     {
         uploadFrame = new JFrame(Value.TITLE);
         uploadFrame.setSize(600, 200);
