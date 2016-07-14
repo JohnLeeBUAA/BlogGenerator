@@ -15,11 +15,9 @@ public class Error extends JFrame
 {
     private static final long serialVersionUID = -6524201347289495994L;
 
-    private JFrame errorFrame;
-
     public void initErrorFrame(String errorMessage)
     {
-        errorFrame = new JFrame(Value.ERROR);
+        JFrame errorFrame = new JFrame(Value.ERROR);
         errorFrame.setSize(600, 200);
         errorFrame.setLocationRelativeTo(null);
         errorFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);

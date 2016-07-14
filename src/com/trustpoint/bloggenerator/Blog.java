@@ -1,23 +1,38 @@
 package com.trustpoint.bloggenerator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.jar.Attributes.Name;
 
 import javax.lang.model.type.PrimitiveType;
 import javax.naming.InitialContext;
+import javax.net.ssl.HttpsURLConnection;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -54,6 +70,7 @@ public class Blog extends JFrame
     private JFrame blogFrame;
     private JTextArea editor;
     private JTextArea lineNumber;
+    private Font font;
 
     public void initFromDocxFile(File file)
     {
@@ -73,64 +90,140 @@ public class Blog extends JFrame
         blogFrame.setSize(screenSize.width, screenSize.height);
         blogFrame.setLocationRelativeTo(null);
         blogFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        blogFrame.setLayout(new BorderLayout());
+        blogFrame.setLayout(new GridLayout(1, 2));
 
+        // The text editor on the left side of the frame
+        // ----------START editoralPanel---------- //
         JPanel editorPanel = new JPanel(new FlowLayout());
 
-        lineNumber = new JTextArea(Value.EDITOR_INITIAL_LINES, 2);
+        // 3 digits for line number is enough
+        lineNumber = new MyTextArea(Value.EDITOR_INITIAL_LINES, 3);
+
+        // Create a monospaced font
+        font = new Font("monospaced", Font.PLAIN, lineNumber.getFont().getSize());
+
+        lineNumber.setFont(font);
         lineNumber.setEditable(false);
         editorPanel.add(lineNumber);
 
-        editor = new JTextArea(Value.EDITOR_INITIAL_LINES, 60);
+        editor = new MyTextArea(Value.EDITOR_INITIAL_LINES, Value.LINE_LENGTH + 10);
+        editor.setFont(font);
         editor.getDocument().addDocumentListener(new EditorListener());
         editorPanel.add(editor);
 
+        // Update line number
         updateLineNumber();
 
         JScrollPane editorScroller = new JScrollPane(editorPanel);
-        editorScroller.setPreferredSize(new Dimension((screenSize.width / 2), screenSize.height));
-        blogFrame.add(editorScroller, BorderLayout.LINE_START);
+        blogFrame.add(editorScroller);
+        // -----------END editoralPanel----------- //
 
+        // The operation panel on the right side of the frame
+        // ----------START operationPanel---------- //
+        JPanel operationPanel = new JPanel(new BorderLayout());
 
-        JPanel infoPanel = new JPanel(new GridLayout(4, 1));
+        // The input panel on the top right side of the frame
+        // ----------START inputPanel---------- //
+        JPanel inputPanel = new JPanel(new GridLayout(4, 1));
 
-        FlowLayout flowLayout = new FlowLayout(FlowLayout.LEFT);
-        flowLayout.setHgap(20);
-        JPanel fileNamePanel = new JPanel(flowLayout);
+        FlowLayout inputFlowLayout = new FlowLayout(FlowLayout.LEFT);
+        inputFlowLayout.setHgap(Value.FLOWLAYOUT_GAP);
+
+        JPanel inputPanel1 = new JPanel(inputFlowLayout);
+        JPanel inputPanel2 = new JPanel(inputFlowLayout);
+        JPanel inputPanel3 = new JPanel(inputFlowLayout);
+        JPanel inputPanel4 = new JPanel(inputFlowLayout);
+
+        // Labels
+        JLabel categoriesLabel = new JLabel("Categories:", JLabel.RIGHT);
+        Dimension labelDimension = categoriesLabel.getMinimumSize();
+        categoriesLabel.setPreferredSize(labelDimension);
         JLabel fileNameLabel = new JLabel("File Name:", JLabel.RIGHT);
-        Dimension dimension = fileNameLabel.getPreferredSize();
-        fileNameLabel.setPreferredSize(new Dimension(dimension.width * 2, dimension.height));
-        JTextField fileNameText = new JTextField();
-        //fileNameText.setColumns(50);
-        fileNamePanel.add(fileNameLabel);
-        fileNamePanel.add(fileNameText);
+        fileNameLabel.setPreferredSize(labelDimension);
+        JLabel titleLabel = new JLabel("Title:", JLabel.RIGHT);
+        titleLabel.setPreferredSize(labelDimension);
+        JLabel authorLabel = new JLabel("Author:", JLabel.RIGHT);
+        authorLabel.setPreferredSize(labelDimension);
+        JLabel dateLabel = new JLabel("Date:", JLabel.RIGHT);
+        dateLabel.setPreferredSize(labelDimension);
 
-        infoPanel.add(fileNamePanel);
+        // Inputs
+        JTextField fileNameInput = new JTextField();
+        Dimension inputDimension = new Dimension(
+                (screenSize.width) / 2 - Value.FLOWLAYOUT_GAP * 3 - labelDimension.width,
+                fileNameInput.getPreferredSize().height);
+        Dimension inputDimensionHalf = new Dimension(
+                ((screenSize.width) / 2 - Value.FLOWLAYOUT_GAP * 5 - labelDimension.width * 2) / 2,
+                fileNameInput.getPreferredSize().height);
+        fileNameInput.setPreferredSize(inputDimension);
+        JTextField titleInput = new JTextField();
+        titleInput.setPreferredSize(inputDimension);
+        JComboBox<String> authorInput = new JComboBox<String>(AuthorList.nameList.toArray((new String[0])));
+        authorInput.setPreferredSize(inputDimensionHalf);
+        JTextField dateInput = new JTextField();
+        dateInput.setPreferredSize(inputDimensionHalf);
+        JTextField categoriesInput = new JTextField();
+        categoriesInput.setPreferredSize(inputDimensionHalf);
+        JTextField categoriesList = new JTextField();
+        categoriesList.setPreferredSize(inputDimensionHalf);
+        JButton addCategoryButton = new JButton("Add Cat.");
+        //addCategoryButton.setPreferredSize(labelDimension);
 
-        JPanel fileNamePanel2 = new JPanel(flowLayout);
-        JLabel fileNameLabel2 = new JLabel("A looooonger j label:", JLabel.RIGHT);
-        Dimension dimension2 = fileNameLabel2.getPreferredSize();
-        fileNameLabel2.setPreferredSize(new Dimension(dimension2.width * 2, dimension2.height));
-        JTextField fileNameText2 = new JTextField();
-        //fileNameText.setColumns(50);
-        fileNamePanel2.add(fileNameLabel2);
-        fileNamePanel2.add(fileNameText2);
+        inputPanel1.add(fileNameLabel);
+        inputPanel1.add(fileNameInput);
+        inputPanel.add(inputPanel1);
+        inputPanel2.add(titleLabel);
+        inputPanel2.add(titleInput);
+        inputPanel.add(inputPanel2);
+        inputPanel3.add(authorLabel);
+        inputPanel3.add(authorInput);
+        inputPanel3.add(dateLabel);
+        inputPanel3.add(dateInput);
+        inputPanel.add(inputPanel3);
+        inputPanel4.add(categoriesLabel);
+        inputPanel4.add(categoriesInput);
+        //inputPanel4.add(categoriesList);
+        inputPanel4.add(addCategoryButton);
+        inputPanel.add(inputPanel4);
 
-        infoPanel.add(fileNamePanel2);
+        operationPanel.add(inputPanel, BorderLayout.PAGE_START);
+        // -----------END inputPanel----------- //
 
-        blogFrame.add(infoPanel, BorderLayout.CENTER);
+        // The button panel on the bottom right side of the frame
+        // ----------START bottonPanel---------- //
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 1));
 
+        FlowLayout buttonFlowLayout = new FlowLayout(FlowLayout.CENTER);
 
-//        FlowLayout buttonFlowLayout = new FlowLayout(FlowLayout.CENTER);
-//        buttonFlowLayout.setVgap(20);
-//        JPanel buttonPanel = new JPanel(buttonFlowLayout);
-//        JButton saveButton = new JButton("Save Changes");
-//        saveButton.addActionListener(new saveButtonListener());
-//        buttonPanel.add(saveButton);
-//        JButton writeButton = new JButton("Write to File");
-//        writeButton.addActionListener(new writeButtonListener());
-//        buttonPanel.add(writeButton);
-//        blogFrame.add(buttonPanel, BorderLayout.PAGE_END);
+        JPanel buttonPanel1 = new JPanel(buttonFlowLayout);
+        JPanel buttonPanel2 = new JPanel(buttonFlowLayout);
+
+        // Buttons
+        JButton uploadImgButton = new JButton("Upload Image");
+        uploadImgButton.addActionListener(new UploadImgButtonListener());
+        JButton addImgExcerptButton = new JButton("Add/Change Excerpt Image");
+        addImgExcerptButton.addActionListener(new AddImgExcerptButtonListener());
+        buttonPanel1.add(addImgExcerptButton);
+        JButton addImgBlogButton = new JButton("Add Image To Blog");
+        addImgBlogButton.addActionListener(new AddImgBlogButtonListener());
+        JButton saveButton = new JButton("Save Changes");
+        saveButton.addActionListener(new SaveButtonListener());
+        JButton writeButton = new JButton("Write to File");
+        writeButton.addActionListener(new WriteButtonListener());
+
+        buttonPanel1.add(uploadImgButton);
+        buttonPanel1.add(addImgExcerptButton);
+        buttonPanel1.add(addImgBlogButton);
+        buttonPanel.add(buttonPanel1);
+        buttonPanel2.add(saveButton);
+        buttonPanel2.add(writeButton);
+        buttonPanel.add(buttonPanel2);
+
+        operationPanel.add(buttonPanel, BorderLayout.PAGE_END);
+        // -----------END buttonPanel----------- //
+
+        blogFrame.add(operationPanel);
+        // -----------END operationPanel----------- //
 
         blogFrame.setVisible(true);
     }
@@ -149,6 +242,21 @@ public class Blog extends JFrame
         }
     }
 
+    private void uploadImg()
+    {
+
+    }
+
+    private void addImgBlog()
+    {
+
+    }
+
+    private void addImgExcerpt()
+    {
+
+    }
+
     private void save()
     {
 
@@ -159,7 +267,53 @@ public class Blog extends JFrame
 
     }
 
-    private class saveButtonListener implements ActionListener
+    private class MyTextArea extends JTextArea
+    {
+        private static final long serialVersionUID = 1584484767928290057L;
+
+        public MyTextArea(int rows, int coloumns)
+        {
+            super(rows, coloumns);
+        }
+
+        @Override
+        public void paintComponent(Graphics g)
+        {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setColor(Color.RED);
+            FontMetrics fm = g2.getFontMetrics();
+            int width = fm.charWidth('a');
+            g2.drawLine(width * Value.LINE_LENGTH, 0, width * Value.LINE_LENGTH, getHeight());
+            g2.dispose();
+        }
+    }
+
+    private class UploadImgButtonListener implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            uploadImg();
+        }
+    }
+
+    private class AddImgBlogButtonListener implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            addImgBlog();
+        }
+    }
+
+    private class AddImgExcerptButtonListener implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            addImgExcerpt();
+        }
+    }
+
+    private class SaveButtonListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -167,7 +321,7 @@ public class Blog extends JFrame
         }
     }
 
-    private class writeButtonListener implements ActionListener
+    private class WriteButtonListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -198,8 +352,28 @@ public class Blog extends JFrame
 
     public static void main(String[] args)
     {
-        Blog blog = new Blog();
-        blog.initBlogFrame();
+        //AuthorList.init();
+        //Blog blog = new Blog();
+        //blog.initBlogFrame();
+        try {
+            URL url = new URL("https://www.google.ca/search?q=CEO");
+            HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
+            httpcon.addRequestProperty("User-Agent", "Chrome/51.0.2704");
+            //httpcon.addRequestProperty("User-Agent", "Mozilla/4.76");
+            //Thread.sleep(10000);
+            BufferedReader br =
+                    new BufferedReader(
+                        new InputStreamReader(httpcon.getInputStream()));
+
+                   String input;
+
+                   while ((input = br.readLine()) != null){
+                      System.out.println(input);
+                   }
+                   br.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
 }

@@ -9,11 +9,12 @@ package com.trustpoint.bloggenerator;
 public class Author
 {
     private String name;
-    private String nameCode;
+    private String code;
 
-    public Author(String name) {
+    public Author(String name)
+    {
         this.name = name;
-        this.nameCode = AuthorList.getNameCode(name);
+        this.code = AuthorList.getCode(name);
     }
 
     public String getName()
@@ -24,11 +25,11 @@ public class Author
     public void setName(String name)
     {
         this.name = name;
-        this.nameCode = AuthorList.getNameCode(name);
+        this.code = AuthorList.getCode(name);
     }
 
-    public String getNameCode()
+    public String getCode()
     {
-        return nameCode;
+        return code;
     }
 }

@@ -13,21 +13,28 @@ import java.util.List;
 public class AuthorList
 {
     public static List<String> nameList;
-    public static HashMap<String, String> nameCode; // <name, code>
+    public static HashMap<String, String> nameToCode; // <name, code>
+    public static HashMap<String, String> codeToName; // <code, name>
 
     public static void init()
     {
         // TODO: init authors from file.
 
         nameList = new ArrayList<String>();
+        nameList.add("");
         nameList.add("Zijin Li");
 
-        nameCode = new HashMap<>();
-        nameCode.put("Zijin Li", "zli");
+        nameToCode = new HashMap<>();
+        nameToCode.put("Zijin Li", "zli");
     }
 
-    public static String getNameCode(String name)
+    public static String getCode(String name)
     {
-        return nameCode.get(name);
+        return nameToCode.get(name);
+    }
+
+    public static String getName(String code)
+    {
+        return codeToName.get(code);
     }
 }
