@@ -1,7 +1,7 @@
 package com.trustpoint.bloggenerator;
 
 /**
- * Store values used in other files.
+ * Store values used globally.
  *
  * @author zli
  *
@@ -10,12 +10,14 @@ public class Value
 {
     public static String BASE_DIR;
 
+    // TODO: change eclipse_workspace to website
     public static final String RELATIVE_DIR = "eclipse_workspace/BlogGenerator";
     public static final String SELF_DIR = "BlogGenerator";
     public static final String AUTHOR_DIR = "src/www/_config.yml";
     public static final String CATEGORY_DIR = "build/categories/";
     public static final String GENERATE = "generate";
     public static final String EDIT = "edit";
+    public static final String GOOGLE_SEARCH_URL = "https://www.google.ca/search?q=";
 
     public static final String[] NO_CAPITAL_WORD_LIST = { "in", "and", "the", "a", "to" };
 

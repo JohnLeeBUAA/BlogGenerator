@@ -52,7 +52,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author zli
  *
  */
-public class Blog extends JFrame
+public class GUITest extends JFrame
 {
     private static final long serialVersionUID = 131029660448982933L;
 
@@ -208,11 +208,14 @@ public class Blog extends JFrame
         // The button panel on the bottom right side of the frame
         // ----------START bottonPanel---------- //
         JPanel buttonPanel = new JPanel(new GridLayout(2, 1));
+        //buttonPanel.setPreferredSize(new Dimension((screenSize.width) / 2, buttonPanel.getPreferredSize().height));
 
         FlowLayout buttonFlowLayout = new FlowLayout(FlowLayout.CENTER);
 
         JPanel buttonPanel1 = new JPanel(buttonFlowLayout);
+        //buttonPanel1.setPreferredSize(new Dimension((screenSize.width) / 2, buttonPanel1.getPreferredSize().height));
         JPanel buttonPanel2 = new JPanel(buttonFlowLayout);
+        //buttonPanel2.setPreferredSize(new Dimension((screenSize.width) / 2, buttonPanel2.getPreferredSize().height));
 
         // Buttons
         JButton uploadImgButton = new JButton("Upload Image");
@@ -248,15 +251,12 @@ public class Blog extends JFrame
     {
         abbrPanel.removeAll();
 
-        GridLayout gridLayout = new GridLayout(abbr.listCt() + 3, 1);
-        abbrPanel.setLayout(gridLayout);
-
         FlowLayout inputFlowLayout = new FlowLayout(FlowLayout.LEFT);
         inputFlowLayout.setHgap(Value.FLOWLAYOUT_GAP);
 
-        JPanel abbrPanel1 = new JPanel(inputFlowLayout);
-        JPanel abbrPanel2 = new JPanel(inputFlowLayout);
-        JPanel abbrPanel3 = new JPanel(inputFlowLayout);
+        abbrPanel.setLayout(inputFlowLayout);
+        abbrPanel.setPreferredSize(
+                new Dimension((screenSize.width) / 2, abbrPanel.getPreferredSize().height));
 
         // Labels, inputs and buttons
         JLabel abbrLabel = new JLabel("Abbreviation", JLabel.LEFT);
@@ -276,33 +276,30 @@ public class Blog extends JFrame
         JButton addAbbrButton = new JButton("Add Abbr");
         addAbbrButton.setPreferredSize(dimensionSmall);
 
-        abbrPanel1.add(abbrLabel);
-        abbrPanel.add(abbrPanel1);
-        abbrPanel2.add(addAbbrInput);
-        abbrPanel2.add(addAbbrButton);
-        abbrPanel.add(abbrPanel2);
-        abbrPanel3.add(shortLabel);
-        abbrPanel3.add(fullLabel);
-        abbrPanel.add(abbrPanel3);
+        abbrPanel.add(abbrLabel);
+        abbrPanel.add(addAbbrInput);
+        abbrPanel.add(addAbbrButton);
+        abbrPanel.add(shortLabel);
+        abbrPanel.add(fullLabel);
 
         for (Map.Entry<String, String> abbrRecord : abbr.getList().entrySet()) {
             JPanel abbrRecordPanel = new JPanel(inputFlowLayout);
-            
+
             JTextField abbrRecordShort = new JTextField(abbrRecord.getKey());
             abbrRecordShort.setPreferredSize(dimensionSmall);
             abbrRecordShortList.add(abbrRecordShort);
-            
+
             JTextField abbrRecordFull = new JTextField(abbrRecord.getValue());
             abbrRecordFull.setPreferredSize(dimensionLarge);
             abbrRecordFullList.add(abbrRecordFull);
-            
+
             JButton deleteAbbrButton = new JButton("Delete Abbr");
             deleteAbbrButton.setPreferredSize(dimensionSmall);
-            
+
             abbrRecordPanel.add(abbrRecordShort);
             abbrRecordPanel.add(abbrRecordFull);
             abbrRecordPanel.add(deleteAbbrButton);
-            
+
             abbrPanel.add(abbrRecordPanel);
         }
     }
@@ -443,7 +440,7 @@ public class Blog extends JFrame
     public static void main(String[] args)
     {
         AuthorList.init();
-        Blog blog = new Blog();
+        GUITest blog = new GUITest();
         blog.initBlogFrame();
         blog.abbr = new Abbr();
         blog.initAbbrPanel();

@@ -24,8 +24,16 @@ public class AuthorList
         nameList.add("");
         nameList.add("Zijin Li");
 
-        nameToCode = new HashMap<>();
+        nameToCode = new HashMap<String, String>();
         nameToCode.put("Zijin Li", "zli");
+
+        codeToName = new HashMap<String, String>();
+        codeToName.put("zli", "Zijin Li");
+    }
+
+    public static void update()
+    {
+
     }
 
     public static String getCode(String name)

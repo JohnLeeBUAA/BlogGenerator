@@ -31,8 +31,7 @@ public class BlogGenerator extends JFrame
         // Validate path and get base directory
         String currentDir = System.getProperty("user.dir");
         if (!(currentDir.substring(currentDir.length() - Value.RELATIVE_DIR.length()))
-                .equals(Value.RELATIVE_DIR))
-        {
+                .equals(Value.RELATIVE_DIR)) {
             Error error = new Error();
             error.initErrorFrame(
                     "Please put the BlogGenerator folder directly under the website folder.");
@@ -87,8 +86,7 @@ public class BlogGenerator extends JFrame
             fileChooser.setFileFilter(filter);
             fileChooser.setAcceptAllFileFilterUsed(false);
             int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION)
-            {
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 Blog blog = new Blog();
                 blog.initFromDocxFile(selectedFile);
@@ -106,8 +104,7 @@ public class BlogGenerator extends JFrame
             fileChooser.setFileFilter(filter);
             fileChooser.setAcceptAllFileFilterUsed(false);
             int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION)
-            {
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
                 Blog blog = new Blog();
                 blog.initFromHTMLFile(selectedFile);

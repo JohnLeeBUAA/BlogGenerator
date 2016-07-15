@@ -20,7 +20,7 @@ public class Error extends JFrame
         JFrame errorFrame = new JFrame(Value.ERROR);
         errorFrame.setSize(600, 200);
         errorFrame.setLocationRelativeTo(null);
-        errorFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        errorFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         GridLayout gridLayout = new GridLayout(3, 1);
         errorFrame.setLayout(gridLayout);
