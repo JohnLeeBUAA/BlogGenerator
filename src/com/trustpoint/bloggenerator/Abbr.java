@@ -1,13 +1,9 @@
 package com.trustpoint.bloggenerator;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 
 /**
- * Handle a list of abbreviation of a single blog.
+ * Store a list of abbreviations in a single blog.
  *
  * @author zli
  *
@@ -19,10 +15,6 @@ public class Abbr
     public Abbr()
     {
         list = new HashMap<String, String>();
-
-        // TODO: get rid of this later
-        list.put("M2M", "Machine to Machine");
-
     }
 
     public int listCt()
@@ -35,36 +27,27 @@ public class Abbr
         return list;
     }
 
-    public void setList(HashMap<String, String> list)
+    public void addAbbr(String shortForm, String fullForm)
     {
-        this.list = list;
-    }
-
-    public void addAbbr(String abbr)
-    {
-        // String fullForm = AbbrList.getFullForm(abbr);
-        String fullForm = "test";
-
-    }
-
-    private String googleFullForm(String abbr)
-    {
-        String fullForm = "";
-        try {
-            URL url = new URL(Value.GOOGLE_SEARCH_URL + abbr);
-            HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-            httpcon.addRequestProperty("User-Agent", "Chrome/51.0.2704");
-            BufferedReader br = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
-            String input;
-            while ((input = br.readLine()) != null) {
-                // TODO: Get the full form of abbr in html
-            }
-            br.close();
-        } catch (Exception e) {
+        if (list.containsKey(shortForm)) {
             Error error = new Error();
-            error.initErrorFrame(
-                    "Exception getting Google search result of " + abbr + ".\n" + e.getMessage());
+            error.initErrorFrame("Abbreviaton: \"" + shortForm + "\" has already been added.");
+        } else {
+            if (fullForm.equals("")) {
+                fullForm = AbbrList.getFullForm(shortForm);
+            }
+            list.put(shortForm, fullForm);
         }
-        return fullForm;
+    }
+
+    public void removeAbbr(String shortForm)
+    {
+        if (!list.containsKey(shortForm)) {
+            Error error = new Error();
+            error.initErrorFrame("Abbreviaton: \"" + shortForm + "\" is not in the list.");
+        }
+        else {
+            list.remove(shortForm);
+        }
     }
 }

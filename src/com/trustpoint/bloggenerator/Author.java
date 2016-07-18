@@ -11,6 +11,12 @@ public class Author
     private String name;
     private String code;
 
+    public Author()
+    {
+        this.name = "";
+        this.code = "";
+    }
+
     public Author(String name)
     {
         this.name = name;

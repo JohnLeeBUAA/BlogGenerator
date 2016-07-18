@@ -39,8 +39,11 @@ public class BlogGenerator extends JFrame
         }
         Value.BASE_DIR = currentDir.substring(0, currentDir.length() - Value.SELF_DIR.length());
 
-        // Get all authors info from files
+        // Init all data to be used
+        AbbrList.init();
         AuthorList.init();
+        CategoryList.init();
+        LowercaseWordList.init();
 
         // Build the frame
         initUploadFrame();

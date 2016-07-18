@@ -39,12 +39,14 @@ public class FileExtractor {
                 {
                     System.out.println("Empty");
                 }
+
+                String numfmt = paragraph.getNumFmt();
+                if (numfmt != null)
+                {
+                    System.out.println(numfmt);
+                }
             }
-//                String numfmt = paragraph.getNumFmt();
-//                if (numfmt != null)
-//                {
-//                    System.out.println(numfmt);
-//                }
+
 //
 //                int pos = 0;
 //                for (XWPFRun run : paragraph.getRuns()) {
