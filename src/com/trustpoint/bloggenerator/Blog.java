@@ -378,8 +378,7 @@ public class Blog extends JFrame
         // Parse each paragraph
         try {
             // FileInputStream fis = new FileInputStream("/Users/zli/Downloads/google.docx");
-            FileInputStream fis = new FileInputStream(
-                    "/Users/zli/Downloads/TrustPoint in the Community.docx");
+            FileInputStream fis = new FileInputStream(file);
             document = new XWPFDocument(fis);
             List<XWPFParagraph> paragraphs = document.getParagraphs();
             lastParagraphStyle = new ParagraphStyle();
@@ -483,11 +482,11 @@ public class Blog extends JFrame
     {
         if (currentRun instanceof XWPFHyperlinkRun) {
             currentRunStyle.isHyperLink = true;
-            currentRunStyle.link = ((XWPFHyperlinkRun) currentRun).getHyperlink(document).getURL();
+            currentRunStyle.url = ((XWPFHyperlinkRun) currentRun).getHyperlink(document).getURL();
         }
         else {
             currentRunStyle.isHyperLink = false;
-            currentRunStyle.link = "";
+            currentRunStyle.url = "";
         }
 
         currentRunStyle.script = currentRun.getSubscript();
@@ -495,13 +494,39 @@ public class Blog extends JFrame
 
     private void setRunTags()
     {
-
+        if (!lastRunStyle.script.equals(currentRunStyle.script)) {
+            if (lastRunStyle.script.equals(VerticalAlign.SUBSCRIPT)) {
+                currentParagraphText += Value.HTML_SUB_SCRIPT_CLOSE;
+            }
+            else if (lastRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
+                currentParagraphText += Value.HTML_SUPER_SCRIPT_CLOSE;
+            }
+        }
+        
+        if (lastRunStyle.isHyperLink != currentRunStyle.isHyperLink) {
+            if (lastRunStyle.isHyperLink) {
+                currentParagraphText += Value.HTML_LINK_CLOSE;
+            }
+            
+            if (currentRunStyle.isHyperLink) {
+                currentParagraphText += Value.HTML_LINK_OPEN(currentRunStyle.url);
+            }
+        }
+        
+        if (!lastRunStyle.script.equals(currentRunStyle.script)) {
+            if (currentRunStyle.script.equals(VerticalAlign.SUBSCRIPT)) {
+                currentParagraphText += Value.HTML_SUB_SCRIPT_OPEN;
+            }
+            else if (currentRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
+                currentParagraphText += Value.HTML_SUPER_SCRIPT_OPEN;
+            }
+        }
     }
 
     private void updateRunStyle()
     {
         lastRunStyle.isHyperLink = currentRunStyle.isHyperLink;
-        lastRunStyle.link = currentRunStyle.link;
+        lastRunStyle.url = currentRunStyle.url;
         lastRunStyle.script = currentRunStyle.script;
     }
 
@@ -509,8 +534,15 @@ public class Blog extends JFrame
     {
         if (!lastRunStyle.script.equals(VerticalAlign.BASELINE)) {
             if (lastRunStyle.script.equals(VerticalAlign.SUBSCRIPT)) {
-                currentParagraphText +=
+                currentParagraphText += Value.HTML_SUB_SCRIPT_CLOSE;
             }
+            else if (lastRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
+                currentParagraphText += Value.HTML_SUPER_SCRIPT_CLOSE;
+            }
+        }
+        
+        if (lastRunStyle.isHyperLink) {
+            currentParagraphText += Value.HTML_LINK_CLOSE;
         }
     }
 
@@ -639,13 +671,13 @@ public class Blog extends JFrame
     private class RunStyle
     {
         public boolean isHyperLink;
-        public String link;
+        public String url;
         public VerticalAlign script;
 
         public void setDefaultStyle()
         {
             this.isHyperLink = false;
-            this.link = "";
+            this.url = "";
             this.script = VerticalAlign.BASELINE;
         }
     }
@@ -756,17 +788,4 @@ public class Blog extends JFrame
             updateLineNumber();
         }
     }
-
-    public static void main(String[] args)
-    {
-        AbbrList.init();
-        AuthorList.init();
-        CategoryList.init();
-        LowercaseWordList.init();
-        Blog blog = new Blog();
-        blog.initFromDocxFile(null);
-        // blog.initBlogFrame();
-        // blog.initAbbrPanel();
-    }
-
 }

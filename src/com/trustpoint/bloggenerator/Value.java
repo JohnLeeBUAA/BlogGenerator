@@ -11,7 +11,7 @@ public class Value
     public static String BASE_DIR;
 
     // TODO: change eclipse_workspace to website
-    public static final String RELATIVE_DIR = "eclipse_workspace/BlogGenerator";
+    public static final String RELATIVE_DIR = "Documents\\BlogGenerator";
     public static final String SELF_DIR = "BlogGenerator";
     public static final String AUTHOR_DIR = "src/www/_config.yml";
     public static final String CATEGORY_DIR = "build/categories/";
@@ -66,4 +66,14 @@ public class Value
     public static final String HTML_BULLET_LIST_CLOSE = "</ul>";
     public static final String HTML_LIST_OPEN = "<li>";
     public static final String HTML_LIST_CLOSE = "</li>";
+    public static final String HTML_SUPER_SCRIPT_OPEN = "<sup>";
+    public static final String HTML_SUPER_SCRIPT_CLOSE = "</sup>";
+    public static final String HTML_SUB_SCRIPT_OPEN = "<sub>";
+    public static final String HTML_SUB_SCRIPT_CLOSE = "</sub>";
+    public static final String HTML_LINK_CLOSE = "</a>";
+    
+    public static String HTML_LINK_OPEN(String url)
+    {
+        return "<a href=\"" + url + "\">";
+    }
 }
