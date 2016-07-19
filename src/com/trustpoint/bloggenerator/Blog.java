@@ -2,51 +2,32 @@ package com.trustpoint.bloggenerator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.ComponentOrientation;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.Attributes.Name;
 
-import javax.lang.model.type.PrimitiveType;
-import javax.naming.InitialContext;
-import javax.net.ssl.HttpsURLConnection;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xwpf.usermodel.VerticalAlign;
@@ -64,20 +45,6 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 public class Blog extends JFrame
 {
     private static final long serialVersionUID = 131029660448982933L;
-
-    private String operation;
-
-    private List<String> lines;
-    private int lineCt;
-    private int headerEOL;
-
-    private String oldFileName;
-    private String fileName;
-    private String title;
-    private String date;
-    private Author author;
-    private String categories;
-    private Abbr abbr;
 
     // GUI elements
     private JFrame blogFrame;
@@ -99,11 +66,23 @@ public class Blog extends JFrame
     private Dimension abbrRecordShortDimension;
     private Dimension abbrRecordFullDimension;
 
+    // User inputs
+    private String oldFileName;
+    private String fileName;
+    private String title;
+    private String date;
+    private Author author;
+    private String categories;
+    private Abbr abbr;
+
     // Parse elements
+    private String operation;
+    private Header header;
+    private List<Paragraph> paragraphs;
+    private File file;
     private XWPFDocument document;
     private XWPFParagraph currentParagraph;
     private XWPFRun currentRun;
-    private String currentParagraphText;
     private ParagraphStyle lastParagraphStyle;
     private ParagraphStyle currentParagraphStyle;
     private RunStyle lastRunStyle;
@@ -113,9 +92,8 @@ public class Blog extends JFrame
     {
         operation = "";
 
-        lines = new ArrayList<String>();
-        lineCt = 0;
-        headerEOL = 0;
+        header = new Header();
+        paragraphs = new ArrayList<Paragraph>();
 
         oldFileName = "";
         fileName = "";
@@ -130,17 +108,17 @@ public class Blog extends JFrame
     {
         operation = Value.OPERATION_GENERATE;
         initBlogFrame();
-        parseDOCXFile(file);
+        this.file = file;
+        parseDOCXFile();
         initInput();
+        trimSpace();
+        replaceHTMLChars();
         displayBlog();
     }
 
     public void initFromHTMLFile(File file)
     {
-        operation = Value.OPERATION_EDIT;
-        initBlogFrame();
-        parseHTMLFile(file);
-        getInputFromBlog();
+        // TODO: implement this
     }
 
     private void initBlogFrame()
@@ -363,50 +341,50 @@ public class Blog extends JFrame
         blogFrame.repaint();
     }
 
-    private void parseDOCXFile(File file)
+    private void parseDOCXFile()
     {
         // Add header
-        lines.add(Value.HEADER_START + "\n");
-        lines.add(Value.HEADER_LAYOUT + "\n");
-        lines.add(Value.HEADER_TITLE + "\n");
-        lines.add(Value.HEADER_DATE + "\n");
-        lines.add(Value.HEADER_AUTHOR + "\n");
-        lines.add(Value.HEADER_CATEGORIES + "\n");
-        lines.add(Value.HEADER_EXCERPT + "\n");
-        lines.add(Value.HEADER_END + "\n");
+        header.headerLines.add(Value.HEADER_START);
+        header.headerLines.add(Value.HEADER_LAYOUT);
+        header.headerLines.add(Value.HEADER_TITLE);
+        header.headerLines.add(Value.HEADER_DATE);
+        header.headerLines.add(Value.HEADER_AUTHOR);
+        header.headerLines.add(Value.HEADER_CATEGORIES);
+        header.headerLines.add(Value.HEADER_EXCERPT);
+        header.headerLines.add(Value.HEADER_END);
 
         // Parse each paragraph
         try {
-            // FileInputStream fis = new FileInputStream("/Users/zli/Downloads/google.docx");
             FileInputStream fis = new FileInputStream(file);
             document = new XWPFDocument(fis);
-            List<XWPFParagraph> paragraphs = document.getParagraphs();
+            List<XWPFParagraph> docxParagraphs = document.getParagraphs();
             lastParagraphStyle = new ParagraphStyle();
-            lastParagraphStyle.style = Value.PARAGRAPH_STYLE_PLAIN;
+            lastParagraphStyle.setDefaultStyle();
             currentParagraphStyle = new ParagraphStyle();
-            for (int i = 0; i < paragraphs.size(); i++) {
-                currentParagraph = paragraphs.get(i);
+            for (int i = 0; i < docxParagraphs.size(); i++) {
+                currentParagraph = docxParagraphs.get(i);
                 String paragraphText = currentParagraph.getParagraphText();
                 if (!StringUtils.isBlank(paragraphText)) {
-                    currentParagraphText = "";
-                    currentParagraphStyle.style = "";
-                    getParagraphTextAndStyle();
+                    currentParagraphStyle.setDefaultStyle();
+                    Paragraph paragraph = new Paragraph();
+                    paragraph.runs = getParagraphRunsAndStyle();
                     setParagraphTags();
                     switch (currentParagraphStyle.style) {
                     case Value.PARAGRAPH_STYLE_BULLET:
                     case Value.PARAGRAPH_STYLE_DECIMAL:
-                        lines.add(Value.LINE_PREFIX + Value.HTML_LIST_OPEN + currentParagraphText
-                                + Value.HTML_LIST_CLOSE + "\n");
+                        paragraph.openTag = Value.HTML_LIST_OPEN;
+                        paragraph.closeTag = Value.HTML_LIST_CLOSE;
                         break;
                     case Value.PARAGRAPH_STYLE_HEADER:
-                        lines.add("\n" + Value.HTML_HEADER_OPEN + currentParagraphText
-                                + Value.HTML_HEADER_CLOSE + "\n");
+                        paragraph.openTag = Value.HTML_HEADER_OPEN;
+                        paragraph.closeTag = Value.HTML_HEADER_CLOSE;
                         break;
                     case Value.PARAGRAPH_STYLE_PLAIN:
-                        lines.add("\n" + Value.HTML_PARAGRAPH_OPEN + currentParagraphText
-                                + Value.HTML_PATAGRAPH_CLOSE + "\n");
+                        paragraph.openTag = Value.HTML_PARAGRAPH_OPEN;
+                        paragraph.closeTag = Value.HTML_PATAGRAPH_CLOSE;
                         break;
                     }
+                    paragraphs.add(paragraph);
                     updateParagraphStyle();
                 }
             }
@@ -422,14 +400,22 @@ public class Blog extends JFrame
     {
         if (!lastParagraphStyle.style.equals(currentParagraphStyle.style)) {
             if (lastParagraphStyle.style.equals(Value.PARAGRAPH_STYLE_BULLET)) {
-                lines.add(Value.HTML_BULLET_LIST_CLOSE + "\n");
+                Paragraph bulletClose = new Paragraph();
+                bulletClose.closeTag = Value.HTML_BULLET_LIST_CLOSE;
+                paragraphs.add(bulletClose);
             } else if (lastParagraphStyle.style.equals(Value.PARAGRAPH_STYLE_DECIMAL)) {
-                lines.add(Value.HTML_NUMBER_LIST_CLOSE + "\n");
+                Paragraph numberClose = new Paragraph();
+                numberClose.closeTag = Value.HTML_NUMBER_LIST_CLOSE;
+                paragraphs.add(numberClose);
             }
             if (currentParagraphStyle.style.equals(Value.PARAGRAPH_STYLE_BULLET)) {
-                lines.add("\n" + Value.HTML_BULLET_LIST_OPEN + "\n");
+                Paragraph bulletOpen = new Paragraph();
+                bulletOpen.openTag = Value.HTML_BULLET_LIST_OPEN;
+                paragraphs.add(bulletOpen);
             } else if (currentParagraphStyle.style.equals(Value.PARAGRAPH_STYLE_DECIMAL)) {
-                lines.add("\n" + Value.HTML_NUMBER_LIST_OPEN + "\n");
+                Paragraph numberOpen = new Paragraph();
+                numberOpen.openTag = Value.HTML_NUMBER_LIST_OPEN;
+                paragraphs.add(numberOpen);
             }
         }
     }
@@ -442,40 +428,52 @@ public class Blog extends JFrame
     private void setLastParagraphTags()
     {
         if (lastParagraphStyle.style.equals(Value.PARAGRAPH_STYLE_BULLET)) {
-            lines.add(Value.HTML_BULLET_LIST_CLOSE + "\n");
+            Paragraph bulletClose = new Paragraph();
+            bulletClose.closeTag = Value.HTML_BULLET_LIST_CLOSE;
+            paragraphs.add(bulletClose);
         } else if (lastParagraphStyle.style.equals(Value.PARAGRAPH_STYLE_DECIMAL)) {
-            lines.add(Value.HTML_NUMBER_LIST_CLOSE + "\n");
+            Paragraph numberClose = new Paragraph();
+            numberClose.closeTag = Value.HTML_NUMBER_LIST_CLOSE;
+            paragraphs.add(numberClose);
         }
     }
 
-    private void getParagraphTextAndStyle()
+    private List<Run> getParagraphRunsAndStyle()
     {
-        List<XWPFRun> runs = currentParagraph.getRuns();
+        List<XWPFRun> docxRuns = currentParagraph.getRuns();
 
         // Set paragraph style
         String numfmt = currentParagraph.getNumFmt();
         if (numfmt != null) {
             currentParagraphStyle.style = numfmt;
-        }
-        else if (runs.get(0).isBold()) {
+        } else if (docxRuns.get(0).isBold()) {
             currentParagraphStyle.style = Value.PARAGRAPH_STYLE_HEADER;
-        }
-        else {
+        } else {
             currentParagraphStyle.style = Value.PARAGRAPH_STYLE_PLAIN;
         }
 
-        // Set paragraph text
+        // Set paragraph runs
+        List<Run> tempRuns = new ArrayList<Run>();
         lastRunStyle = new RunStyle();
         lastRunStyle.setDefaultStyle();
         currentRunStyle = new RunStyle();
-        for (int i = 0; i < runs.size(); i++) {
-            currentRun = runs.get(i);
+        currentRunStyle.setDefaultStyle();
+        for (int i = 0; i < docxRuns.size(); i++) {
+            currentRun = docxRuns.get(i);
             getRunStyle();
-            setRunTags();
-            currentParagraphText += currentRun.toString();
+            Run newRun = new Run();
+            tempRuns.add(newRun);
+            if (i == 0) {
+                setFirstRunTags(tempRuns.get(i));
+            } else {
+                setRunTags(tempRuns.get(i - 1), tempRuns.get(i));
+            }
+            newRun.text = currentRun.toString();
             updateRunStyle();
         }
-        setLastRunTags();
+        setLastRunTags(tempRuns.get(tempRuns.size() - 1));
+
+        return tempRuns;
     }
 
     private void getRunStyle()
@@ -483,8 +481,7 @@ public class Blog extends JFrame
         if (currentRun instanceof XWPFHyperlinkRun) {
             currentRunStyle.isHyperLink = true;
             currentRunStyle.url = ((XWPFHyperlinkRun) currentRun).getHyperlink(document).getURL();
-        }
-        else {
+        } else {
             currentRunStyle.isHyperLink = false;
             currentRunStyle.url = "";
         }
@@ -492,33 +489,44 @@ public class Blog extends JFrame
         currentRunStyle.script = currentRun.getSubscript();
     }
 
-    private void setRunTags()
+    private void setFirstRunTags(Run run)
+    {
+        if (currentRunStyle.isHyperLink) {
+            run.openTag += Value.HTML_LINK_OPEN(currentRunStyle.url);
+        }
+
+        if (currentRunStyle.script.equals(VerticalAlign.SUBSCRIPT)) {
+            run.openTag += Value.HTML_SUB_SCRIPT_OPEN;
+        } else if (currentRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
+            run.openTag += Value.HTML_SUPER_SCRIPT_OPEN;
+        }
+    }
+
+    private void setRunTags(Run lastRun, Run currentRun)
     {
         if (!lastRunStyle.script.equals(currentRunStyle.script)) {
             if (lastRunStyle.script.equals(VerticalAlign.SUBSCRIPT)) {
-                currentParagraphText += Value.HTML_SUB_SCRIPT_CLOSE;
-            }
-            else if (lastRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
-                currentParagraphText += Value.HTML_SUPER_SCRIPT_CLOSE;
+                lastRun.closeTag += Value.HTML_SUB_SCRIPT_CLOSE;
+            } else if (lastRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
+                lastRun.closeTag += Value.HTML_SUPER_SCRIPT_CLOSE;
             }
         }
-        
+
         if (lastRunStyle.isHyperLink != currentRunStyle.isHyperLink) {
             if (lastRunStyle.isHyperLink) {
-                currentParagraphText += Value.HTML_LINK_CLOSE;
+                lastRun.closeTag += Value.HTML_LINK_CLOSE;
             }
-            
+
             if (currentRunStyle.isHyperLink) {
-                currentParagraphText += Value.HTML_LINK_OPEN(currentRunStyle.url);
+                currentRun.openTag += Value.HTML_LINK_OPEN(currentRunStyle.url);
             }
         }
-        
+
         if (!lastRunStyle.script.equals(currentRunStyle.script)) {
             if (currentRunStyle.script.equals(VerticalAlign.SUBSCRIPT)) {
-                currentParagraphText += Value.HTML_SUB_SCRIPT_OPEN;
-            }
-            else if (currentRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
-                currentParagraphText += Value.HTML_SUPER_SCRIPT_OPEN;
+                currentRun.openTag += Value.HTML_SUB_SCRIPT_OPEN;
+            } else if (currentRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
+                currentRun.openTag += Value.HTML_SUPER_SCRIPT_OPEN;
             }
         }
     }
@@ -530,25 +538,19 @@ public class Blog extends JFrame
         lastRunStyle.script = currentRunStyle.script;
     }
 
-    private void setLastRunTags()
+    private void setLastRunTags(Run run)
     {
         if (!lastRunStyle.script.equals(VerticalAlign.BASELINE)) {
             if (lastRunStyle.script.equals(VerticalAlign.SUBSCRIPT)) {
-                currentParagraphText += Value.HTML_SUB_SCRIPT_CLOSE;
-            }
-            else if (lastRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
-                currentParagraphText += Value.HTML_SUPER_SCRIPT_CLOSE;
+                run.closeTag += Value.HTML_SUB_SCRIPT_CLOSE;
+            } else if (lastRunStyle.script.equals(VerticalAlign.SUPERSCRIPT)) {
+                run.closeTag += Value.HTML_SUPER_SCRIPT_CLOSE;
             }
         }
-        
+
         if (lastRunStyle.isHyperLink) {
-            currentParagraphText += Value.HTML_LINK_CLOSE;
+            run.closeTag += Value.HTML_LINK_CLOSE;
         }
-    }
-
-    private void parseHTMLFile(File file)
-    {
-
     }
 
     private void initInput()
@@ -556,31 +558,104 @@ public class Blog extends JFrame
 
     }
 
-    private void getInputFromBlog()
+    private void trimSpace()
     {
+        for (int i = 0; i < paragraphs.size(); i++) {
+            for (int j = 0; j < paragraphs.get(i).runs.size(); j++) {
+                // Trim out tab or duplicated spaces
+                paragraphs.get(i).runs.get(j).text = paragraphs.get(i).runs.get(j).text
+                        .replaceAll("\\s+", " ");
 
+                // Trim out leading spaces
+                if (j == 0 || !paragraphs.get(i).runs.get(j).openTag.equals("")) {
+                    paragraphs.get(i).runs.get(j).text = StringUtils
+                            .stripStart(paragraphs.get(i).runs.get(j).text, " ");
+                }
+
+                // Trim out trailing spaces
+                if (j == paragraphs.get(i).runs.size() - 1
+                        || !paragraphs.get(i).runs.get(j).closeTag.equals("")) {
+                    paragraphs.get(i).runs.get(j).text = StringUtils
+                            .stripEnd(paragraphs.get(i).runs.get(j).text, " ");
+                }
+            }
+        }
+    }
+
+    private void replaceHTMLChars()
+    {
+        for (int i = 0; i < paragraphs.size(); i++) {
+            for (int j = 0; j < paragraphs.get(i).runs.size(); j++) {
+                String text = paragraphs.get(i).runs.get(j).text;
+                // Need to manually replace '&' first because other chars contains '&'
+                // Add an extra space is to make sure that we don't replace
+                text = text.replaceAll("& ", "&amp; ");
+                for (Map.Entry<String, String> htmlChar : Value.htmlCharsTable.entrySet()) {
+                    text = text.replaceAll(htmlChar.getKey(), htmlChar.getValue());
+                }
+                paragraphs.get(i).runs.get(j).text = text;
+            }
+        }
     }
 
     private void displayBlog()
     {
         editor.setText("");
-        for (int i = 0; i < lines.size(); i++) {
-            // Break lines longer than 100 chars
-            int startLineIndex = 0;
-            int endLineIndex = lines.get(i).length();
-//            while (endLineIndex - startLineIndex > Value.LINE_LENGTH) {
-//                int spaceIndex = lines.get(i).lastIndexOf(' ', startLineIndex + Value.LINE_LENGTH);
-//                if (spaceIndex == -1) {
-//                    spaceIndex = lines.get(i).indexOf(' ', startLineIndex + Value.LINE_LENGTH + 1);
-//                }
-//                if (spaceIndex == -1) {
-//                    break;
-//                } else {
-//                    editor.append(lines.get(i).substring(startLineIndex, spaceIndex) + "\n");
-//                    startLineIndex = spaceIndex + 1;
-//                }
-//            }
-            editor.append(lines.get(i).substring(startLineIndex, endLineIndex));
+        for (int i = 0; i < header.headerLines.size(); i++) {
+            editor.append(header.headerLines.get(i) + "\n");
+        }
+
+        String line = "";
+        for (int i = 0; i < paragraphs.size(); i++) {
+            editor.append("\n");
+            line = "";
+            line += paragraphs.get(i).openTag;
+            for (int j = 0; j < paragraphs.get(i).runs.size(); j++) {
+                if ((line + paragraphs.get(i).runs.get(j).openTag).length() > Value.LINE_LENGTH) {
+                    editor.append(StringUtils.stripEnd(line, " ") + "\n");
+                    line = paragraphs.get(i).runs.get(j).openTag;
+                } else {
+                    line += paragraphs.get(i).runs.get(j).openTag;
+                }
+
+                String runText = paragraphs.get(i).runs.get(j).text;
+
+                if (!StringUtils.isBlank(runText)) {
+                    String[] wordList = StringUtils.split(runText);
+
+                    if (runText.charAt(0) == ' ') {
+                        wordList[0] = " " + wordList[0];
+                    }
+                    for (int k = 1; k < wordList.length; k++) {
+                        wordList[k] = " " + wordList[k];
+                    }
+                    for (int k = 0; k < wordList.length; k++) {
+                        if ((line + wordList[k]).length() > Value.LINE_LENGTH) {
+                            editor.append(StringUtils.stripEnd(line, " ") + "\n");
+                            line = StringUtils.trim(wordList[k]);
+                        } else {
+                            line += wordList[k];
+                        }
+                    }
+                    if (runText.charAt(runText.length() - 1) == ' ') {
+                        line += " ";
+                    }
+                }
+
+                if ((line + paragraphs.get(i).runs.get(j).closeTag).length() > Value.LINE_LENGTH) {
+                    editor.append(StringUtils.stripEnd(line, " ") + "\n");
+                    line = paragraphs.get(i).runs.get(j).closeTag;
+                } else {
+                    line += paragraphs.get(i).runs.get(j).closeTag;
+                }
+            }
+            if ((line + paragraphs.get(i).closeTag).length() > Value.LINE_LENGTH) {
+                editor.append(StringUtils.stripEnd(line, " ") + "\n");
+                line = paragraphs.get(i).closeTag;
+            } else {
+                line += paragraphs.get(i).closeTag;
+            }
+            editor.append(StringUtils.stripEnd(line, " ") + "\n");
         }
     }
 
@@ -663,9 +738,52 @@ public class Blog extends JFrame
 
     }
 
+    private class Header
+    {
+        public List<String> headerLines;
+
+        public Header()
+        {
+            this.headerLines = new ArrayList<String>();
+        }
+    }
+
+    private class Paragraph
+    {
+        public String openTag;
+        public String closeTag;
+        public List<Run> runs;
+
+        public Paragraph()
+        {
+            openTag = "";
+            closeTag = "";
+            runs = new ArrayList<Run>();
+        }
+    }
+
     private class ParagraphStyle
     {
         public String style;
+
+        public void setDefaultStyle()
+        {
+            this.style = Value.PARAGRAPH_STYLE_PLAIN;
+        }
+    }
+
+    private class Run
+    {
+        public String openTag;
+        public String closeTag;
+        public String text;
+
+        public Run()
+        {
+            this.openTag = "";
+            this.closeTag = "";
+            this.text = "";
+        }
     }
 
     private class RunStyle

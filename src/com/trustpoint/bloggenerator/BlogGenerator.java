@@ -54,7 +54,7 @@ public class BlogGenerator extends JFrame
         uploadFrame = new JFrame(Value.TITLE);
         uploadFrame.setSize(600, 200);
         uploadFrame.setLocationRelativeTo(null);
-        uploadFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        uploadFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         GridLayout gridLayout = new GridLayout(3, 1);
         uploadFrame.setLayout(gridLayout);
@@ -74,9 +74,22 @@ public class BlogGenerator extends JFrame
 
         JButton uploadHtml = new JButton("Edit Existing HTML Blog");
         uploadHtml.addActionListener(new HtmlClickListener());
+        // TODO: remove this when parsing HTML is implemented
+        uploadHtml.setEnabled(false);
         panel.add(uploadHtml);
 
         uploadFrame.add(panel);
+
+        JPanel updatePanel = new JPanel(new FlowLayout());
+
+        JButton updateButton = new JButton("Update Resources From Current Blogs");
+        updateButton.addActionListener(new updateButtonListener());
+        // TODO: remove this when updating is implemented
+        updateButton.setEnabled(false);
+        updatePanel.add(updateButton);
+
+        uploadFrame.add(updatePanel);
+
         uploadFrame.setVisible(true);
     }
 
@@ -113,6 +126,17 @@ public class BlogGenerator extends JFrame
                 blog.initFromHTMLFile(selectedFile);
                 uploadFrame.dispose();
             }
+        }
+    }
+
+    private class updateButtonListener implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            AbbrList.update();
+            AuthorList.update();
+            CategoryList.update();
+            LowercaseWordList.update();
         }
     }
 

@@ -25,4 +25,9 @@ public class LowercaseWordList
         lowercaseWordList.add("to");
     }
 
+    public static void update()
+    {
+        // TODO: update text file from blogs
+    }
+
 }

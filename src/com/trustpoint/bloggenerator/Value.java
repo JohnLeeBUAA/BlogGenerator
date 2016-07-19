@@ -1,5 +1,7 @@
 package com.trustpoint.bloggenerator;
 
+import java.util.HashMap;
+
 /**
  * Store values used globally.
  *
@@ -11,7 +13,7 @@ public class Value
     public static String BASE_DIR;
 
     // TODO: change eclipse_workspace to website
-    public static final String RELATIVE_DIR = "Documents\\BlogGenerator";
+    public static final String RELATIVE_DIR = "eclipse_workspace/BlogGenerator";
     public static final String SELF_DIR = "BlogGenerator";
     public static final String AUTHOR_DIR = "src/www/_config.yml";
     public static final String CATEGORY_DIR = "build/categories/";
@@ -25,7 +27,6 @@ public class Value
     // GUI values
     public static final String TITLE = "Blog Generator";
     public static final String ERROR = "Error";
-    public static final String FILENAMEINPUT_PLACEHOLDER = "File name will be generated automatically if title and date are set";
     public static final int EDITOR_INITIAL_LINES = 100;
     public static final int LINE_LENGTH = 100;
     public static final int FLOWLAYOUT_GAP = 10;
@@ -71,9 +72,40 @@ public class Value
     public static final String HTML_SUB_SCRIPT_OPEN = "<sub>";
     public static final String HTML_SUB_SCRIPT_CLOSE = "</sub>";
     public static final String HTML_LINK_CLOSE = "</a>";
-    
+    public static final String HTML_ABBR_CLOSE = "</abbr>";
+
     public static String HTML_LINK_OPEN(String url)
     {
         return "<a href=\"" + url + "\">";
+    }
+
+    public static String HTML_ABBR_OPEN(String abbr)
+    {
+        return "<abbr title=\"" + abbr + "\">";
+    }
+
+    public static String HTML_IMAGE(String src, String alt)
+    {
+        return "<figure><img src=\"" + src + "\" alt=\"" + alt + "\"/><figure>";
+    }
+
+    // HTML chars
+    // '&' is ascii 38, need to add an extra space so that '&'s in other html chars are not
+    // replaced.
+    // For this program, it will replace different chars with corresponding html chars, regardless
+    // of whether it is used correctly or not. So the responsibility of using correct chars is on
+    // the writer's side.
+    public static final String HTML_CHAR_HELLIP = "&hellip;";
+    public static final HashMap<String, String> htmlCharsTable;
+    static {
+        htmlCharsTable = new HashMap<String, String>();
+        htmlCharsTable.put(Character.toString((char) 34), "&quot;");
+        htmlCharsTable.put("& ", "&amp; ");
+        htmlCharsTable.put(Character.toString((char) 8211), "&ndash;");
+        htmlCharsTable.put(Character.toString((char) 8212), "&mdash;");
+        htmlCharsTable.put(Character.toString((char) 8216), "'");
+        htmlCharsTable.put(Character.toString((char) 8217), "'");
+        htmlCharsTable.put(Character.toString((char) 8220), "&ldquo;");
+        htmlCharsTable.put(Character.toString((char) 8221), "&rdquo;");
     }
 }
