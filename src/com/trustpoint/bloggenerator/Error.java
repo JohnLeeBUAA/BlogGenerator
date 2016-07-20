@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 /**
- * Display an error message.
+ * Display an error message
  *
  * @author zli
  *

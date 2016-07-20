@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Store the list of all authors.
+ * Store the list of all authors
  *
  * @author zli
  *
@@ -18,7 +18,7 @@ public class AuthorList
 
     public static void init()
     {
-        // TODO: init authors from text file.
+        // TODO: init authors from text file
 
         nameList = new ArrayList<String>();
         nameList.add("");
@@ -33,7 +33,7 @@ public class AuthorList
 
     public static void update()
     {
-        // TODO: update text file form config file.
+        // TODO: update text file resources from existing blogs
     }
 
     public static String getCode(String name)

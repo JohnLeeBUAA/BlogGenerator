@@ -2,8 +2,12 @@ package com.trustpoint.bloggenerator;
 
 import java.util.HashMap;
 
+import javax.naming.spi.DirStateFactory.Result;
+
+import org.apache.commons.lang3.StringUtils;
+
 /**
- * Store a list of all abbreviations used in former blogs.
+ * Store a list of all abbreviations used in former blogs
  *
  * @author zli
  *
@@ -14,7 +18,7 @@ public class AbbrList
 
     public static void init()
     {
-        // TODO: init abbrList from text file.
+        // TODO: init abbrList from text file
 
         abbrList = new HashMap<String, String>();
         abbrList.put("IoT", "Internet of Things");
@@ -23,7 +27,7 @@ public class AbbrList
 
     public static void update()
     {
-        // TODO: update file from former blogs.
+        // TODO: update text file resources from existing blogs
     }
 
     public static String getFullForm(String shortForm)

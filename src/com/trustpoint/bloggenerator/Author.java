@@ -1,7 +1,7 @@
 package com.trustpoint.bloggenerator;
 
 /**
- * Handle a single author.
+ * Handle a single author
  *
  * @author zli
  *

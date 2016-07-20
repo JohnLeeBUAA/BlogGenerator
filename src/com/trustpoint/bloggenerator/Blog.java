@@ -12,9 +12,14 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +42,7 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 
 /**
- * Handle a single blog.
+ * Handle a single blog
  *
  * @author zli
  *
@@ -76,7 +81,6 @@ public class Blog extends JFrame
     private Abbr abbr;
 
     // Parse elements
-    private String operation;
     private Header header;
     private List<Paragraph> paragraphs;
     private File file;
@@ -90,29 +94,39 @@ public class Blog extends JFrame
 
     public Blog()
     {
-        operation = "";
+        this.oldFileName = "";
+        this.fileName = "";
+        this.title = "";
+        this.date = "";
+        this.author = new Author();
+        this.categories = "";
+        this.abbr = new Abbr();
 
-        header = new Header();
-        paragraphs = new ArrayList<Paragraph>();
-
-        oldFileName = "";
-        fileName = "";
-        title = "";
-        date = "";
-        author = new Author();
-        categories = "";
-        abbr = new Abbr();
+        this.header = new Header();
+        this.paragraphs = new ArrayList<Paragraph>();
     }
 
     public void initFromDocxFile(File file)
     {
-        operation = Value.OPERATION_GENERATE;
-        initBlogFrame();
         this.file = file;
+
+        // Build GUI
+        initBlogFrame();
+
+        // Parse DOCS file
         parseDOCXFile();
-        initInput();
+
+        // Compact runs
+        compactRuns();
+
+        // Format content
         trimSpace();
         replaceHTMLChars();
+
+        // Set or generate inputs
+        initInput();
+
+        // Display the generated blog in editor
         displayBlog();
     }
 
@@ -121,6 +135,9 @@ public class Blog extends JFrame
         // TODO: implement this
     }
 
+    /**
+     * Build the main frame
+     */
     private void initBlogFrame()
     {
         blogFrame = new JFrame(Value.TITLE);
@@ -129,6 +146,7 @@ public class Blog extends JFrame
         blogFrame.setLocationRelativeTo(null);
         blogFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         blogFrame.setLayout(new GridLayout(1, 2));
+        blogFrame.addComponentListener(new ResizeEventListener());
 
         // The text editor on the left side of the frame
         // ----------START editoralPanel---------- //
@@ -195,17 +213,19 @@ public class Blog extends JFrame
                 fileNameInput.getPreferredSize().height);
         fileNameInput.setPreferredSize(inputDimension);
         titleInput = new JTextField();
+        titleInput.getDocument().addDocumentListener(new FileNameListener());
         titleInput.setPreferredSize(inputDimension);
         authorInput = new JComboBox<String>(AuthorList.nameList.toArray((new String[0])));
         authorInput.setPreferredSize(inputDimensionHalf);
         dateInput = new JTextField();
+        dateInput.getDocument().addDocumentListener(new FileNameListener());
         dateInput.setPreferredSize(inputDimensionHalf);
         categoriesInput = new JTextField();
         categoriesInput.setPreferredSize(inputDimensionHalf);
         categoryList = new JComboBox<String>(CategoryList.categoryList.toArray((new String[0])));
         categoryList.setPreferredSize(inputDimensionHalf);
         JButton addCategoryButton = new JButton("Add Category");
-        addCategoryButton.addActionListener(new addCategoryButtonListener());
+        addCategoryButton.addActionListener(new AddCategoryButtonListener());
         buttonDimension = addCategoryButton.getMinimumSize();
         Dimension categoryListDimension = new Dimension(
                 (screenSize.width) / 2 - Value.FLOWLAYOUT_GAP * 5 - labelDimension.width
@@ -252,7 +272,7 @@ public class Blog extends JFrame
         addAbbrInputFull.setPreferredSize(abbrRecordFullDimension);
         JButton addAbbrButton = new JButton("Add Abbr");
         addAbbrButton.setPreferredSize(buttonDimension);
-        addAbbrButton.addActionListener(new addAbbrButtonListener());
+        addAbbrButton.addActionListener(new AddAbbrButtonListener());
         JLabel abbrShortLabel = new JLabel("Short Form:", JLabel.LEFT);
         abbrShortLabel.setPreferredSize(abbrLabelDimension);
         JLabel abbrFullLabel = new JLabel("Full Form:", JLabel.LEFT);
@@ -313,12 +333,15 @@ public class Blog extends JFrame
         blogFrame.setVisible(true);
     }
 
+    /**
+     * Build the panel for abbreviation
+     */
     private void initAbbrPanel()
     {
         abbrPanel.removeAll();
         abbrPanel.setLayout(inputFlowLayout);
 
-        for (Map.Entry<String, String> abbrRecord : abbr.getList().entrySet()) {
+        for (Map.Entry<String, String> abbrRecord : abbr.list.entrySet()) {
             JTextField abbrRecordShort = new JTextField(abbrRecord.getKey());
             abbrRecordShort.setPreferredSize(abbrRecordShortDimension);
             abbrRecordShort.setEditable(false);
@@ -329,18 +352,33 @@ public class Blog extends JFrame
 
             JButton deleteAbbrButton = new JButton("Delete Abbr");
             deleteAbbrButton.setPreferredSize(buttonDimension);
-            deleteAbbrButton.addActionListener(new deleteAbbrButtonListener());
+            deleteAbbrButton.addActionListener(new DeleteAbbrButtonListener());
             deleteAbbrButton.setActionCommand(abbrRecord.getKey());
 
             abbrPanel.add(abbrRecordShort);
             abbrPanel.add(abbrRecordFull);
             abbrPanel.add(deleteAbbrButton);
+
+            int emptyWidth = blogFrame.getSize().width / 2 - abbrRecordShortDimension.width
+                    - abbrRecordFullDimension.width - buttonDimension.width
+                    - Value.FLOWLAYOUT_GAP * 4;
+
+            // Fill the empty space on the right of each line
+            if (emptyWidth > 0) {
+                JLabel emptyLabel = new JLabel();
+                emptyLabel.setPreferredSize(new Dimension(emptyWidth - Value.FLOWLAYOUT_GAP,
+                        emptyLabel.getPreferredSize().height));
+                abbrPanel.add(emptyLabel);
+            }
         }
 
         blogFrame.revalidate();
         blogFrame.repaint();
     }
 
+    /**
+     * Parse DOCX file
+     */
     private void parseDOCXFile()
     {
         // Add header
@@ -396,6 +434,34 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Compact runs without tags
+     */
+    private void compactRuns()
+    {
+        for (int i = 0; i < paragraphs.size(); i++) {
+            if (paragraphs.get(i).runs.size() > 1) {
+                int runIndex = 1;
+                while (runIndex < paragraphs.get(i).runs.size()) {
+                    if (paragraphs.get(i).runs.get(runIndex - 1).closeTag.equals("")
+                            && paragraphs.get(i).runs.get(runIndex).openTag.equals("")) {
+                        paragraphs.get(i).runs.get(runIndex - 1).text += paragraphs.get(i).runs
+                                .get(runIndex).text;
+                        paragraphs.get(i).runs.get(runIndex - 1).closeTag = paragraphs.get(i).runs
+                                .get(runIndex).closeTag;
+                        paragraphs.get(i).runs.remove(runIndex);
+                    } else {
+                        runIndex++;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Close the tag of the last paragraph and open the tag of current paragraph according to their
+     * styles
+     */
     private void setParagraphTags()
     {
         if (!lastParagraphStyle.style.equals(currentParagraphStyle.style)) {
@@ -420,11 +486,17 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Set the style of lastParagraphSytle to current paragraph's style for parsing next paragraph
+     */
     private void updateParagraphStyle()
     {
         lastParagraphStyle.style = currentParagraphStyle.style;
     }
 
+    /**
+     * CLose the tag of the last paragraph
+     */
     private void setLastParagraphTags()
     {
         if (lastParagraphStyle.style.equals(Value.PARAGRAPH_STYLE_BULLET)) {
@@ -438,6 +510,11 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Get the style and content of current paragraph
+     *
+     * @return List<Run> A list of generated runs in that paragraph
+     */
     private List<Run> getParagraphRunsAndStyle()
     {
         List<XWPFRun> docxRuns = currentParagraph.getRuns();
@@ -468,7 +545,9 @@ public class Blog extends JFrame
             } else {
                 setRunTags(tempRuns.get(i - 1), tempRuns.get(i));
             }
-            newRun.text = currentRun.toString();
+            if (currentRun.toString() != null) {
+                newRun.text = currentRun.toString();
+            }
             updateRunStyle();
         }
         setLastRunTags(tempRuns.get(tempRuns.size() - 1));
@@ -476,6 +555,9 @@ public class Blog extends JFrame
         return tempRuns;
     }
 
+    /**
+     * Get the style of current run
+     */
     private void getRunStyle()
     {
         if (currentRun instanceof XWPFHyperlinkRun) {
@@ -489,6 +571,12 @@ public class Blog extends JFrame
         currentRunStyle.script = currentRun.getSubscript();
     }
 
+    /**
+     * Set the style of first run in the paragraph
+     *
+     * @param run
+     *            The run to set style
+     */
     private void setFirstRunTags(Run run)
     {
         if (currentRunStyle.isHyperLink) {
@@ -502,6 +590,12 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Close the tag of last run and open the tag of current run according to their styles
+     *
+     * @param lastRun
+     * @param currentRun
+     */
     private void setRunTags(Run lastRun, Run currentRun)
     {
         if (!lastRunStyle.script.equals(currentRunStyle.script)) {
@@ -531,6 +625,9 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Set lastRunStyle to current run's style to parse next run
+     */
     private void updateRunStyle()
     {
         lastRunStyle.isHyperLink = currentRunStyle.isHyperLink;
@@ -538,6 +635,12 @@ public class Blog extends JFrame
         lastRunStyle.script = currentRunStyle.script;
     }
 
+    /**
+     * CLose tag of last run in the paragraph
+     *
+     * @param run
+     *            The run to close tag
+     */
     private void setLastRunTags(Run run)
     {
         if (!lastRunStyle.script.equals(VerticalAlign.BASELINE)) {
@@ -553,11 +656,146 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Set or generate all possible inputs after DOCX file is parsed
+     */
     private void initInput()
+    {
+        title = getTitleFromFile();
+        titleInput.setText(title);
+        header.headerLines.set(Value.HEADER_TITLE_LINECT, Value.HEADER_TITLE + title);
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date currentDate = new Date();
+        date = dateFormat.format(currentDate);
+        dateInput.setText(date);
+        header.headerLines.set(Value.HEADER_DATE_LINECT,
+                Value.HEADER_DATE + date + Value.HEADER_TIME);
+
+        getCategoriesInput();
+
+        getAbbrInput();
+        initAbbrPanel();
+        setAbbrInput();
+
+        setHeaderExcerpt();
+    }
+
+    private void setHeaderExcerpt()
     {
 
     }
 
+    /**
+     * Parse the generated blog to get abbreviatons
+     */
+    private void getAbbrInput()
+    {
+        for (int i = 0; i < paragraphs.size(); i++) {
+            for (int j = 0; j < paragraphs.get(i).runs.size(); j++) {
+                String[] list = StringUtils.split(paragraphs.get(i).runs.get(j).text);
+                for (int k = 0; k < list.length; k++) {
+                    String word = list[k];
+
+                    if (word.contains("IT") || word.contains("IoT") || word.contains("UW")
+                            || word.contains("CEO") || word.contains("M2M")
+                            || word.contains("WOW")) {
+                        // Abbreviations are like "IT", "M2M", "IoT", "ECC", "U.S."
+                        // Abbreviation must have a length equal or greater than 2
+                        // The word may have leading or trailing punctuation
+                        while (word.length() > 1 && !Character.isLetter(word.charAt(0))) {
+                            word = word.substring(1);
+                        }
+                        while (word.length() > 1
+                                && !Character.isLetter(word.charAt(word.length() - 1))) {
+                            word = word.substring(0, word.length() - 1);
+                        }
+                        if (word.length() > 1 && Character.isUpperCase(word.charAt(0))
+                                && Character.isUpperCase(word.charAt(word.length() - 1))) {
+                            if (word.contains(".")) {
+                                word += ".";
+                            }
+                            abbr.add(word);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Set abbreviations in blog according this.abbr
+     */
+    private void setAbbrInput()
+    {
+
+    }
+
+    private void getCategoriesInput()
+    {
+        for (Map.Entry<String, Integer> catRecord : CategoryList.categoryCount.entrySet()) {
+            catRecord.setValue(0);
+        }
+
+        for (int i = 0; i < paragraphs.size(); i++) {
+            for (int j = 0; j < paragraphs.get(i).runs.size(); j++) {
+                String text = paragraphs.get(i).runs.get(j).text;
+                for (Map.Entry<String, Integer> catRecord : CategoryList.categoryCount.entrySet()) {
+                    if (StringUtils.containsIgnoreCase(text, catRecord.getKey())) {
+                        catRecord.setValue(catRecord.getValue() + 1);
+                    }
+                }
+            }
+        }
+
+        String result = "";
+        for (Map.Entry<String, Integer> catRecord : CategoryList.categoryCount.entrySet()) {
+            if (catRecord.getValue() > 0) {
+                result += catRecord.getKey() + " ";
+            }
+        }
+        result = result.trim();
+
+        categoriesInput.setText(result);
+        header.headerLines.set(Value.HEADER_CATEGORIES_LINECT, Value.HEADER_CATEGORIES + result);
+    }
+
+    private String getTitleFromFile()
+    {
+        String docxFileName = file.getName();
+        int extPos = docxFileName.lastIndexOf('.');
+        if (extPos != -1) {
+            docxFileName = docxFileName.substring(0, extPos);
+        }
+        docxFileName = docxFileName.replaceAll("\\s+", " ");
+        docxFileName = StringUtils.trim(docxFileName);
+        return capitalize(docxFileName);
+    }
+
+    private String capitalize(String str)
+    {
+        String result = "";
+        if (!StringUtils.isBlank(str)) {
+            if (str.charAt(0) == ' ') {
+                result += " ";
+            }
+            String[] list = StringUtils.split(str);
+            for (int i = 0; i < list.length; i++) {
+                if (!LowercaseWordList.lowercaseWordList.contains(list[i])) {
+                    list[i] = list[i].substring(0, 1).toUpperCase() + list[i].substring(1);
+                }
+                result += list[i] + " ";
+            }
+            if (str.charAt(str.length() - 1) != ' ') {
+                result = StringUtils.stripEnd(result, " ");
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get rid of tab and duplicated spaces
+     */
     private void trimSpace()
     {
         for (int i = 0; i < paragraphs.size(); i++) {
@@ -582,6 +820,9 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Replace special chars with HTML chars
+     */
     private void replaceHTMLChars()
     {
         for (int i = 0; i < paragraphs.size(); i++) {
@@ -598,6 +839,10 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Display generated blog in editor. Break line if length longer than Value.LINE_LENGTH NB:
+     * Cannot break line inside a tag
+     */
     private void displayBlog()
     {
         editor.setText("");
@@ -659,6 +904,9 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Update line number if content in editor changes
+     */
     private void updateLineNumber()
     {
         int lineCount = editor.getLineCount();
@@ -671,6 +919,22 @@ public class Blog extends JFrame
         }
     }
 
+    private void updateFileName()
+    {
+        String tempTitle = titleInput.getText();
+        tempTitle = tempTitle.replaceAll("[^A-Za-z0-9]", " ");
+        tempTitle = tempTitle.replaceAll("\\s+", " ");
+        String tempDate = dateInput.getText();
+        String[] list = StringUtils.split(tempTitle);
+        for (int i = 0; i < list.length; i++) {
+            list[i] = list[i].toLowerCase();
+        }
+        fileNameInput.setText(tempDate + "-" + StringUtils.join(list, "-") + ".html");
+    }
+
+    /**
+     * Set categoriesInput if user add category
+     */
     private void addCategory()
     {
         String input = categoryList.getSelectedItem().toString();
@@ -692,6 +956,9 @@ public class Blog extends JFrame
         categoryList.setSelectedIndex(0);
     }
 
+    /**
+     * Add abbreviation to input
+     */
     private void addAbbr()
     {
         String inputShortForm = addAbbrInputShort.getText();
@@ -707,6 +974,11 @@ public class Blog extends JFrame
         addAbbrInputFull.setText("");
     }
 
+    /**
+     * Delete an abbreviation
+     *
+     * @param shortForm
+     */
     private void deleteAbbr(String shortForm)
     {
         abbr.removeAbbr(shortForm);
@@ -738,6 +1010,7 @@ public class Blog extends JFrame
 
     }
 
+    // ---------- START Private Classes and Action Listeners ---------- //
     private class Header
     {
         public List<String> headerLines;
@@ -822,7 +1095,31 @@ public class Blog extends JFrame
         }
     }
 
-    private class addCategoryButtonListener implements ActionListener
+    private class ResizeEventListener implements ComponentListener
+    {
+        @Override
+        public void componentResized(ComponentEvent e)
+        {
+            initAbbrPanel();
+        }
+
+        @Override
+        public void componentMoved(ComponentEvent e)
+        {
+        }
+
+        @Override
+        public void componentShown(ComponentEvent e)
+        {
+        }
+
+        @Override
+        public void componentHidden(ComponentEvent e)
+        {
+        }
+    }
+
+    private class AddCategoryButtonListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -830,7 +1127,7 @@ public class Blog extends JFrame
         }
     }
 
-    private class addAbbrButtonListener implements ActionListener
+    private class AddAbbrButtonListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -838,7 +1135,7 @@ public class Blog extends JFrame
         }
     }
 
-    private class deleteAbbrButtonListener implements ActionListener
+    private class DeleteAbbrButtonListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -906,4 +1203,26 @@ public class Blog extends JFrame
             updateLineNumber();
         }
     }
+
+    private class FileNameListener implements DocumentListener
+    {
+        @Override
+        public void removeUpdate(DocumentEvent e)
+        {
+            updateFileName();
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e)
+        {
+            updateFileName();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e)
+        {
+            updateFileName();
+        }
+    }
+    // ----------- END Private Classes and Action Listeners ----------- //
 }

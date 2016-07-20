@@ -15,7 +15,7 @@ public class LowercaseWordList
 
     public static void init()
     {
-        // TODO: init list from text file.
+        // TODO: init list from text file
 
         lowercaseWordList = new ArrayList<String>();
         lowercaseWordList.add("in");
@@ -27,7 +27,7 @@ public class LowercaseWordList
 
     public static void update()
     {
-        // TODO: update text file from blogs
+        // TODO: update text file resources from existing blogs
     }
 
 }

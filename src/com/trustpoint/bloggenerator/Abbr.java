@@ -3,30 +3,36 @@ package com.trustpoint.bloggenerator;
 import java.util.HashMap;
 
 /**
- * Store a list of abbreviations in a single blog.
+ * Store a list of abbreviations in a single blog
  *
  * @author zli
  *
  */
 public class Abbr
 {
-    private HashMap<String, String> list;
+    public HashMap<String, String> list;
 
     public Abbr()
     {
         list = new HashMap<String, String>();
     }
 
-    public int listCt()
+    /**
+     * Used when parsing
+     * @param shortForm
+     */
+    public void add(String shortForm)
     {
-        return list.size();
+        if (!list.containsKey(shortForm)) {
+            list.put(shortForm, AbbrList.getFullForm(shortForm));
+        }
     }
 
-    public HashMap<String, String> getList()
-    {
-        return list;
-    }
-
+    /**
+     * Used in GUI
+     * @param shortForm
+     * @param fullForm
+     */
     public void addAbbr(String shortForm, String fullForm)
     {
         if (list.containsKey(shortForm)) {

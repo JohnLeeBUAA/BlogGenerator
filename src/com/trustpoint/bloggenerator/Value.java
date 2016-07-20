@@ -3,7 +3,7 @@ package com.trustpoint.bloggenerator;
 import java.util.HashMap;
 
 /**
- * Store values used globally.
+ * Store values used globally
  *
  * @author zli
  *
@@ -13,16 +13,16 @@ public class Value
     public static String BASE_DIR;
 
     // TODO: change eclipse_workspace to website
-    public static final String RELATIVE_DIR = "eclipse_workspace/BlogGenerator";
-    public static final String SELF_DIR = "BlogGenerator";
-    public static final String AUTHOR_DIR = "src/www/_config.yml";
-    public static final String CATEGORY_DIR = "build/categories/";
+    public static final String RELATIVE_DIR = "/eclipse_workspace/BlogGenerator";
+    public static final String SELF_DIR = "/BlogGenerator";
+    public static final String AUTHOR_DIR = "/src/www/_config.yml";
+    public static final String CATEGORY_DIR = "/build/categories";
     public static final String OPERATION_GENERATE = "generate";
     public static final String OPERATION_EDIT = "edit";
     public static final String GOOGLE_SEARCH_URL = "https://www.google.ca/search?q=";
-    public static final String IMAGE_DIR = "src/www/img/blog-articles/";
+    public static final String IMAGE_SOURCE_DIR = "/src/www/img/blog-articles";
     public static final String LINE_PREFIX = "    ";
-    public static final String IMAGE_DIR_IN_TAG = "/img/blog-articles/";
+    public static final String IMAGE_DIR = "/img/blog-articles";
 
     // GUI values
     public static final String TITLE = "Blog Generator";
@@ -44,10 +44,9 @@ public class Value
     public static final String HEADER_CATEGORIES = "categories: ";
     public static final int HEADER_CATEGORIES_LINECT = 5;
     public static final String HEADER_EXCERPT = "excerpt: >";
-    public static final int HEADER_EXCERPT_LINECT = 6;
+    public static final int HEADER_EXCERPT_CONTENT_LINECT = 7;
     public static final String HEADER_IMAGE = "image: ";
     public static final String HEADER_IMAGE_ALT = "image_alt: ";
-    public static final String HEADER_IMAGE_DIR = "/img/blog-articles/";
     public static final String HEADER_END = "---";
 
     // Paragraph values
@@ -90,19 +89,21 @@ public class Value
     }
 
     // HTML chars
-    // '&' is ascii 38, need to add an extra space so that '&'s in other html chars are not
-    // replaced.
-    // For this program, it will replace different chars with corresponding html chars, regardless
-    // of whether it is used correctly or not. So the responsibility of using correct chars is on
-    // the writer's side.
+
     public static final String HTML_CHAR_HELLIP = "&hellip;";
     public static final HashMap<String, String> htmlCharsTable;
     static {
         htmlCharsTable = new HashMap<String, String>();
         htmlCharsTable.put(Character.toString((char) 34), "&quot;");
+        // '&' is ascii 38, need to add an extra space so that '&'s in other html chars are not
+        // replaced.
         htmlCharsTable.put("& ", "&amp; ");
+        // Most of dashes in existing blogs' docx files are ndash but are replaced with mdash,
+        // whoever write the blog need to be more accurate with dashes
         htmlCharsTable.put(Character.toString((char) 8211), "&ndash;");
         htmlCharsTable.put(Character.toString((char) 8212), "&mdash;");
+        // 8216 should be "&lsquo;" and 8217 should be "&rsquo;", but existing blogs are only using
+        // "'"
         htmlCharsTable.put(Character.toString((char) 8216), "'");
         htmlCharsTable.put(Character.toString((char) 8217), "'");
         htmlCharsTable.put(Character.toString((char) 8220), "&ldquo;");

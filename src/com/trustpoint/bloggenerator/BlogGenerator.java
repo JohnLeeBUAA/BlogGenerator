@@ -15,7 +15,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * The entrance frame of the application. Do some setup work and allow user to choose operation and
- * upload file.
+ * upload file
  *
  * @author zli
  *
@@ -39,13 +39,13 @@ public class BlogGenerator extends JFrame
         }
         Value.BASE_DIR = currentDir.substring(0, currentDir.length() - Value.SELF_DIR.length());
 
-        // Init all data to be used
+        // Initialize all resources to be used
         AbbrList.init();
         AuthorList.init();
         CategoryList.init();
         LowercaseWordList.init();
 
-        // Build the frame
+        // Build GUI
         initUploadFrame();
     }
 
@@ -93,6 +93,7 @@ public class BlogGenerator extends JFrame
         uploadFrame.setVisible(true);
     }
 
+    // ---------- START Action Listeners ---------- //
     private class DocxClickListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
@@ -139,7 +140,13 @@ public class BlogGenerator extends JFrame
             LowercaseWordList.update();
         }
     }
+    // ----------- END Action Listeners ----------- //
 
+    /**
+     * Entrance
+     *
+     * @param args
+     */
     public static void main(String[] args)
     {
         BlogGenerator blogGenerator = new BlogGenerator();
