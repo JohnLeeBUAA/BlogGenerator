@@ -10,9 +10,9 @@ public class Test
 
     public static void main(String[] args)
     {
-        char a = 'z';
-        int b = (int)a;
-        System.out.println(b);
+        String aString = "a";
+        String b = aString.substring(1);
+        System.out.println(b.length());
     }
 
 }

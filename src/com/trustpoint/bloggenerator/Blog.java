@@ -81,7 +81,6 @@ public class Blog extends JFrame
     private Abbr abbr;
 
     // Parse elements
-    private Header header;
     private List<Paragraph> paragraphs;
     private File file;
     private XWPFDocument document;
@@ -102,7 +101,6 @@ public class Blog extends JFrame
         this.categories = "";
         this.abbr = new Abbr();
 
-        this.header = new Header();
         this.paragraphs = new ArrayList<Paragraph>();
     }
 
@@ -381,16 +379,6 @@ public class Blog extends JFrame
      */
     private void parseDOCXFile()
     {
-        // Add header
-        header.headerLines.add(Value.HEADER_START);
-        header.headerLines.add(Value.HEADER_LAYOUT);
-        header.headerLines.add(Value.HEADER_TITLE);
-        header.headerLines.add(Value.HEADER_DATE);
-        header.headerLines.add(Value.HEADER_AUTHOR);
-        header.headerLines.add(Value.HEADER_CATEGORIES);
-        header.headerLines.add(Value.HEADER_EXCERPT);
-        header.headerLines.add(Value.HEADER_END);
-
         // Parse each paragraph
         try {
             FileInputStream fis = new FileInputStream(file);
@@ -663,27 +651,17 @@ public class Blog extends JFrame
     {
         title = getTitleFromFile();
         titleInput.setText(title);
-        header.headerLines.set(Value.HEADER_TITLE_LINECT, Value.HEADER_TITLE + title);
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date currentDate = new Date();
         date = dateFormat.format(currentDate);
         dateInput.setText(date);
-        header.headerLines.set(Value.HEADER_DATE_LINECT,
-                Value.HEADER_DATE + date + Value.HEADER_TIME);
 
         getCategoriesInput();
 
         getAbbrInput();
         initAbbrPanel();
         setAbbrInput();
-
-        setHeaderExcerpt();
-    }
-
-    private void setHeaderExcerpt()
-    {
-
     }
 
     /**
@@ -697,26 +675,22 @@ public class Blog extends JFrame
                 for (int k = 0; k < list.length; k++) {
                     String word = list[k];
 
-                    if (word.contains("IT") || word.contains("IoT") || word.contains("UW")
-                            || word.contains("CEO") || word.contains("M2M")
-                            || word.contains("WOW")) {
-                        // Abbreviations are like "IT", "M2M", "IoT", "ECC", "U.S."
-                        // Abbreviation must have a length equal or greater than 2
-                        // The word may have leading or trailing punctuation
-                        while (word.length() > 1 && !Character.isLetter(word.charAt(0))) {
-                            word = word.substring(1);
+                    // Abbreviations are like "IT", "M2M", "IoT", "ECC", "U.S."
+                    // Abbreviation must have a length equal or greater than 2
+                    // The word may have leading or trailing punctuation
+                    while (word.length() > 1 && !Character.isLetter(word.charAt(0))) {
+                        word = word.substring(1);
+                    }
+                    while (word.length() > 1
+                            && !Character.isLetter(word.charAt(word.length() - 1))) {
+                        word = word.substring(0, word.length() - 1);
+                    }
+                    if (word.length() > 1 && Character.isUpperCase(word.charAt(0))
+                            && Character.isUpperCase(word.charAt(word.length() - 1))) {
+                        if (word.contains(".")) {
+                            word += ".";
                         }
-                        while (word.length() > 1
-                                && !Character.isLetter(word.charAt(word.length() - 1))) {
-                            word = word.substring(0, word.length() - 1);
-                        }
-                        if (word.length() > 1 && Character.isUpperCase(word.charAt(0))
-                                && Character.isUpperCase(word.charAt(word.length() - 1))) {
-                            if (word.contains(".")) {
-                                word += ".";
-                            }
-                            abbr.add(word);
-                        }
+                        abbr.add(word);
                     }
                 }
             }
@@ -728,9 +702,62 @@ public class Blog extends JFrame
      */
     private void setAbbrInput()
     {
+        for (int i = 0; i < paragraphs.size(); i++) {
+            int runIndex = 0;
+            while (runIndex < paragraphs.get(i).runs.size()) {
+                Run tempRun = paragraphs.get(i).runs.get(runIndex);
+                // If it is already in abbr tag, delete or update
+                if (tempRun.closeTag.equals(Value.HTML_ABBR_CLOSE)) {
+                    if (abbr.contains(tempRun.text)) {
+                        tempRun.openTag = Value.HTML_ABBR_OPEN(abbr.fullForm(tempRun.text));
+                    } else {
+                        tempRun.openTag = "";
+                        tempRun.closeTag = "";
+                    }
+                }
+                // Else add abbr tag if text contains short form
+                else {
+                    String originalRunText = tempRun.text;
+                    int abbrIndex = tempRun.text.length();
+                    String abbrToAdd = "";
+                    // Get the first abbr in text
+                    for (Map.Entry<String, String> abbrRecord : abbr.list.entrySet()) {
+                        int pos = originalRunText.indexOf(abbrRecord.getKey());
+                        if (pos != -1 && pos < abbrIndex) {
+                            abbrIndex = pos;
+                            abbrToAdd = abbrRecord.getKey();
+                        }
+                    }
+                    if (!abbrToAdd.equals("")) {
+                        tempRun.text = originalRunText.substring(0, abbrIndex);
 
+                        Run newContentRun = new Run();
+                        newContentRun.closeTag = tempRun.closeTag;
+                        tempRun.closeTag = "";
+                        newContentRun.text = originalRunText
+                                .substring(abbrIndex + abbrToAdd.length());
+
+                        Run abbrRun = new Run();
+                        abbrRun.openTag = Value.HTML_ABBR_OPEN(abbr.fullForm(abbrToAdd));
+                        abbrRun.text = abbrToAdd;
+                        abbrRun.closeTag = Value.HTML_ABBR_CLOSE;
+
+                        // Add new runs to paragraph
+                        paragraphs.get(i).runs.add(runIndex + 1, abbrRun);
+                        paragraphs.get(i).runs.add(runIndex + 2, newContentRun);
+
+                        // Skip the added abbr run
+                        runIndex++;
+                    }
+                }
+                runIndex++;
+            }
+        }
     }
 
+    /**
+     * Generate categories tag from blog content
+     */
     private void getCategoriesInput()
     {
         for (Map.Entry<String, Integer> catRecord : CategoryList.categoryCount.entrySet()) {
@@ -757,9 +784,14 @@ public class Blog extends JFrame
         result = result.trim();
 
         categoriesInput.setText(result);
-        header.headerLines.set(Value.HEADER_CATEGORIES_LINECT, Value.HEADER_CATEGORIES + result);
+        categories = result;
     }
 
+    /**
+     * Get title string from file name
+     *
+     * @return A string representing the title
+     */
     private String getTitleFromFile()
     {
         String docxFileName = file.getName();
@@ -772,6 +804,13 @@ public class Blog extends JFrame
         return capitalize(docxFileName);
     }
 
+    /**
+     * Capitalize the first letter in words in given string if the word in not in LowercaseWordList
+     *
+     * @param str
+     *            The String containing words
+     * @return Capitalized string
+     */
     private String capitalize(String str)
     {
         String result = "";
@@ -841,67 +880,150 @@ public class Blog extends JFrame
 
     /**
      * Display generated blog in editor. Break line if length longer than Value.LINE_LENGTH NB:
-     * Cannot break line inside a tag
+     * Cannot add or leave out spaces when breaking lines
      */
     private void displayBlog()
     {
         editor.setText("");
-        for (int i = 0; i < header.headerLines.size(); i++) {
-            editor.append(header.headerLines.get(i) + "\n");
-        }
 
-        String line = "";
+        // Generate excerpt
+        int excerptIndex = 0;
         for (int i = 0; i < paragraphs.size(); i++) {
-            editor.append("\n");
-            line = "";
-            line += paragraphs.get(i).openTag;
-            for (int j = 0; j < paragraphs.get(i).runs.size(); j++) {
-                if ((line + paragraphs.get(i).runs.get(j).openTag).length() > Value.LINE_LENGTH) {
-                    editor.append(StringUtils.stripEnd(line, " ") + "\n");
-                    line = paragraphs.get(i).runs.get(j).openTag;
-                } else {
-                    line += paragraphs.get(i).runs.get(j).openTag;
-                }
-
-                String runText = paragraphs.get(i).runs.get(j).text;
-
-                if (!StringUtils.isBlank(runText)) {
-                    String[] wordList = StringUtils.split(runText);
-
-                    if (runText.charAt(0) == ' ') {
-                        wordList[0] = " " + wordList[0];
-                    }
-                    for (int k = 1; k < wordList.length; k++) {
-                        wordList[k] = " " + wordList[k];
-                    }
-                    for (int k = 0; k < wordList.length; k++) {
-                        if ((line + wordList[k]).length() > Value.LINE_LENGTH) {
-                            editor.append(StringUtils.stripEnd(line, " ") + "\n");
-                            line = StringUtils.trim(wordList[k]);
-                        } else {
-                            line += wordList[k];
-                        }
-                    }
-                    if (runText.charAt(runText.length() - 1) == ' ') {
-                        line += " ";
-                    }
-                }
-
-                if ((line + paragraphs.get(i).runs.get(j).closeTag).length() > Value.LINE_LENGTH) {
-                    editor.append(StringUtils.stripEnd(line, " ") + "\n");
-                    line = paragraphs.get(i).runs.get(j).closeTag;
-                } else {
-                    line += paragraphs.get(i).runs.get(j).closeTag;
-                }
+            if (paragraphs.get(i).openTag.equals(Value.HTML_PARAGRAPH_OPEN)) {
+                excerptIndex = i;
+                break;
             }
-            if ((line + paragraphs.get(i).closeTag).length() > Value.LINE_LENGTH) {
-                editor.append(StringUtils.stripEnd(line, " ") + "\n");
-                line = paragraphs.get(i).closeTag;
-            } else {
-                line += paragraphs.get(i).closeTag;
-            }
-            editor.append(StringUtils.stripEnd(line, " ") + "\n");
         }
+
+        List<String> excerptLines = displayParagraph(Value.LINE_PREFIX, Value.LINE_LENGTH,
+                paragraphs.get(excerptIndex));
+
+        // Add header
+        editor.append(Value.HEADER_START + "\n");
+        editor.append(Value.HEADER_TITLE + title + "\n");
+        editor.append(Value.HEADER_DATE + date + Value.HEADER_TIME + "\n");
+        editor.append(Value.HEADER_AUTHOR + author.getCode() + "\n");
+        editor.append(Value.HEADER_CATEGORIES + categories + "\n");
+        editor.append(Value.HEADER_EXCERPT + "\n");
+        for (int i = 0; i < excerptLines.size(); i++) {
+            editor.append(excerptLines.get(i) + "\n");
+        }
+        editor.append(Value.HEADER_END + "\n");
+        // TODO: all hellips tag here
+
+        // Add blog content
+        for (int i = 0; i < paragraphs.size(); i++) {
+            List<String> lines = displayParagraph("", Value.LINE_LENGTH, paragraphs.get(i));
+            editor.append("\n");
+            for (int j = 0; j < lines.size(); j++) {
+                editor.append(lines.get(j) + "\n");
+            }
+        }
+    }
+
+    /**
+     * Format the content of a paragraph to a list of strings to display. Break line if length
+     * longer than Value.LINE_LENGTH. NB: Cannot add or leave out spaces when breaking lines
+     *
+     * @param prefix
+     *            The prefix of each line
+     * @param lineLength
+     *            Line length of each line
+     * @param paragraph
+     *            The paragraph to format
+     * @return A list of strings
+     */
+    private List<String> displayParagraph(String prefix, int lineLength, Paragraph paragraph)
+    {
+        int contentLength = lineLength - prefix.length();
+        List<String> result = new ArrayList<String>();
+        String line = paragraph.openTag;
+        int breakPoint = line.length();
+        boolean tagOnly = true;
+
+        for (int i = 0; i < paragraph.runs.size(); i++) {
+            Run tempRun = paragraph.runs.get(i);
+            if (!tempRun.openTag.equals("")) {
+                if ((line.length() + tempRun.openTag.length()) > contentLength
+                        && breakPoint != -1) {
+                    String lineToAdd = line.substring(0, breakPoint);
+                    String lineRemain = line.substring(breakPoint).trim();
+                    result.add(prefix + lineToAdd);
+                    line = lineRemain + tempRun.openTag;
+                    if (lineRemain.length() == 0) {
+                        tagOnly = true;
+                        breakPoint = line.length();
+                    } else {
+                        tagOnly = false;
+                        breakPoint = -1;
+                    }
+                } else {
+                    line += tempRun.openTag;
+                    if (tagOnly) {
+                        breakPoint = line.length();
+                    }
+                }
+            }
+            if (!StringUtils.isBlank(tempRun.text)) {
+                String[] wordList = StringUtils.split(tempRun.text);
+                for (int k = 0; k < wordList.length; k++) {
+                    if (!(k == 0 && tempRun.text.charAt(0) != ' ')) {
+                        line += ' ';
+                        tagOnly = false;
+                        breakPoint = line.length() - 1;
+                    }
+                    if ((line.length() + wordList[k].length()) > contentLength
+                            && breakPoint != -1) {
+                        String lineToAdd = line.substring(0, breakPoint);
+                        String lineRemain = line.substring(breakPoint).trim();
+                        result.add(prefix + lineToAdd);
+                        line = lineRemain + wordList[k];
+                        tagOnly = false;
+                        breakPoint = -1;
+                    }
+                    else {
+                        line += wordList[k];
+                    }
+                }
+                if (tempRun.text.charAt(tempRun.text.length() - 1) == ' ') {
+                    line += ' ';
+                    tagOnly = false;
+                    breakPoint = line.length() - 1;
+                }
+            }
+            if (!tempRun.closeTag.equals("")) {
+                if ((line.length() + tempRun.closeTag.length()) > contentLength
+                        && breakPoint != -1) {
+                    String lineToAdd = line.substring(0, breakPoint);
+                    String lineRemain = line.substring(breakPoint).trim();
+                    result.add(prefix + lineToAdd);
+                    line = lineRemain + tempRun.closeTag;
+                    if (lineRemain.length() == 0) {
+                        tagOnly = true;
+                        breakPoint = line.length();
+                    } else {
+                        tagOnly = false;
+                        breakPoint = -1;
+                    }
+                } else {
+                    line += tempRun.closeTag;
+                    if (tagOnly) {
+                        breakPoint = line.length();
+                    }
+                }
+            }
+        }
+        if ((line.length() + paragraph.closeTag.length()) > contentLength
+                && breakPoint != -1) {
+            String lineToAdd = line.substring(0, breakPoint);
+            String lineRemain = line.substring(breakPoint).trim();
+            result.add(prefix + lineToAdd);
+            line = lineRemain + paragraph.closeTag;
+        } else {
+            line += paragraph.closeTag;
+        }
+        result.add(prefix + line);
+        return result;
     }
 
     /**
@@ -919,6 +1041,9 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Update file name to be saved according to blog title and date
+     */
     private void updateFileName()
     {
         String tempTitle = titleInput.getText();
@@ -1011,15 +1136,6 @@ public class Blog extends JFrame
     }
 
     // ---------- START Private Classes and Action Listeners ---------- //
-    private class Header
-    {
-        public List<String> headerLines;
-
-        public Header()
-        {
-            this.headerLines = new ArrayList<String>();
-        }
-    }
 
     private class Paragraph
     {

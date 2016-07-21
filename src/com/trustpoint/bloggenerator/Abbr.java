@@ -56,4 +56,19 @@ public class Abbr
             list.remove(shortForm);
         }
     }
+
+    public boolean contains(String shortForm)
+    {
+        return list.containsKey(shortForm);
+    }
+
+    public String fullForm(String shortForm)
+    {
+        if (list.containsKey(shortForm)) {
+            return list.get(shortForm);
+        }
+        else {
+            return "";
+        }
+    }
 }

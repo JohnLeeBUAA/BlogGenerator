@@ -35,16 +35,11 @@ public class Value
     public static final String HEADER_START = "---";
     public static final String HEADER_LAYOUT = "layout: post";
     public static final String HEADER_TITLE = "title: ";
-    public static final int HEADER_TITLE_LINECT = 2;
     public static final String HEADER_DATE = "date: ";
     public static final String HEADER_TIME = " 12:00:00";
-    public static final int HEADER_DATE_LINECT = 3;
     public static final String HEADER_AUTHOR = "author: ";
-    public static final int HEADER_AUTHOR_LINECT = 4;
     public static final String HEADER_CATEGORIES = "categories: ";
-    public static final int HEADER_CATEGORIES_LINECT = 5;
     public static final String HEADER_EXCERPT = "excerpt: >";
-    public static final int HEADER_EXCERPT_CONTENT_LINECT = 7;
     public static final String HEADER_IMAGE = "image: ";
     public static final String HEADER_IMAGE_ALT = "image_alt: ";
     public static final String HEADER_END = "---";
@@ -75,7 +70,7 @@ public class Value
 
     public static String HTML_LINK_OPEN(String url)
     {
-        return "<a href=\"" + url + "\">";
+        return "<a href=\"" + url + "\" target=\"_blank\">";
     }
 
     public static String HTML_ABBR_OPEN(String abbr)
