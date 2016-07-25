@@ -23,6 +23,9 @@ public class AuthorList
     public static List<String> nameList;
     public static HashMap<String, String> nameToCode; // <name, code>
 
+    /**
+     * Initialize the list from text file
+     */
     public static void init()
     {
         Path targetDir = Paths.get(Value.BASE_DIR + Value.SELF_DIR + Value.AUTHORS_DIR);
@@ -53,6 +56,12 @@ public class AuthorList
         }
     }
 
+    /**
+     * Get the name code of a name
+     *
+     * @param name
+     * @return
+     */
     public static String getCode(String name)
     {
         return nameToCode.get(name);

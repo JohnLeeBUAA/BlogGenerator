@@ -23,7 +23,7 @@ public class Abbr
     }
 
     /**
-     * Used when parsing
+     * Used in parsing. If the full form is not indicated, it will automatically get full form
      *
      * @param shortForm
      */

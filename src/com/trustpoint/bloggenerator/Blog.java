@@ -103,6 +103,9 @@ public class Blog extends JFrame
     private RunStyle lastRunStyle;
     private RunStyle currentRunStyle;
 
+    /**
+     * Constructor
+     */
     public Blog()
     {
         this.oldFileName = "";
@@ -118,6 +121,11 @@ public class Blog extends JFrame
         this.paragraphs = new ArrayList<Paragraph>();
     }
 
+    /**
+     * Major procedures
+     *
+     * @param file
+     */
     public void initFromDocxFile(File file)
     {
         this.file = file;
@@ -125,7 +133,7 @@ public class Blog extends JFrame
         // Build GUI
         initBlogFrame();
 
-        // Parse DOCS file
+        // Parse DOCX file
         parseDOCXFile();
 
         // Compact runs
@@ -312,7 +320,7 @@ public class Blog extends JFrame
         addImgExcerptButton.addActionListener(new AddImgExcerptButtonListener());
         JButton addImgBlogButton = new JButton("Add Image To Blog");
         addImgBlogButton.addActionListener(new AddImgBlogButtonListener());
-        JButton writeButton = new JButton("Write to File");
+        JButton writeButton = new JButton("Write To File");
         writeButton.addActionListener(new WriteButtonListener());
 
         buttonPanel.add(uploadImgButton);
@@ -336,7 +344,7 @@ public class Blog extends JFrame
     {
         abbrPanel.removeAll();
 
-        FlowLayout abbrFlowLayout = new FlowLayout(FlowLayout.CENTER);
+        FlowLayout abbrFlowLayout = new FlowLayout(FlowLayout.LEFT);
         abbrFlowLayout.setHgap(Value.FLOWLAYOUT_GAP);
         abbrPanel.setLayout(abbrFlowLayout);
 
@@ -375,7 +383,7 @@ public class Blog extends JFrame
             }
         }
 
-        // Add an empty line
+        // Add an empty line and the update button
         JLabel emptyLabel = new JLabel(" ");
         emptyLabel.setPreferredSize(
                 new Dimension(blogFrame.getSize().width / 2 - Value.FLOWLAYOUT_GAP,
@@ -383,6 +391,12 @@ public class Blog extends JFrame
         abbrPanel.add(emptyLabel);
         JButton updateButton = new JButton("Update Changes");
         updateButton.addActionListener(new UpdateButtonListener());
+        JLabel emptyLabel2 = new JLabel(" ");
+        emptyLabel2.setPreferredSize(new Dimension(
+                abbrRecordShortDimension.width + abbrRecordFullDimension.width / 2
+                        - updateButton.getPreferredSize().width / 2,
+                emptyLabel2.getPreferredSize().height));
+        abbrPanel.add(emptyLabel2);
         abbrPanel.add(updateButton);
 
         blogFrame.revalidate();
@@ -684,7 +698,7 @@ public class Blog extends JFrame
     }
 
     /**
-     * Parse the generated blog to get abbreviatons
+     * Parse the generated blog to get abbreviations
      */
     private void getAbbrInput()
     {
@@ -1106,6 +1120,12 @@ public class Blog extends JFrame
         return true;
     }
 
+    /**
+     * Generate the image alt from image name
+     *
+     * @param imgName
+     * @return
+     */
     private String getImaAlt(String imgName)
     {
         String result = imgName;
@@ -1205,6 +1225,9 @@ public class Blog extends JFrame
         initAbbrPanel();
     }
 
+    /**
+     * Upload image to correct folder
+     */
     private void uploadImg()
     {
         Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
@@ -1236,6 +1259,9 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Add an image tag in blog content
+     */
     private void addImgBlog()
     {
         Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
@@ -1259,6 +1285,9 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Add or update image used in excerpt
+     */
     private void addImgExcerpt()
     {
         Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
@@ -1281,6 +1310,9 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Make changes visible in editor
+     */
     private void update()
     {
         if (validateAndGetInput()) {
@@ -1289,6 +1321,9 @@ public class Blog extends JFrame
         }
     }
 
+    /**
+     * Write the content in editor to file system
+     */
     private void write()
     {
         Path targetDir = Paths.get(Value.BASE_DIR + Value.BLOG_DIR);

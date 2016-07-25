@@ -13,7 +13,7 @@ import java.util.HashMap;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Store a list of all abbreviations used in former blogs
+ * Store a list of all abbreviations frequently used in former blogs
  *
  * @author zli
  *
@@ -22,6 +22,9 @@ public class AbbrList
 {
     public static HashMap<String, String> abbrList;
 
+    /**
+     * Initialize the list from text file
+     */
     public static void init()
     {
         Path targetDir = Paths.get(Value.BASE_DIR + Value.SELF_DIR + Value.ABBR_DIR);
@@ -47,6 +50,13 @@ public class AbbrList
         }
     }
 
+    /**
+     * Get the full form of an abbreviation. First try to find in list, if the list does not contain
+     * the abbreviation do Google search
+     *
+     * @param shortForm
+     * @return
+     */
     public static String getFullForm(String shortForm)
     {
         if (abbrList.containsKey(shortForm)) {
@@ -56,6 +66,13 @@ public class AbbrList
         }
     }
 
+    /**
+     * Use Google search to find the full form of an abbreviation. The result is the first
+     * definition of Wikipedia, not always accurate
+     *
+     * @param abbr
+     * @return
+     */
     public static String googleFullForm(String abbr)
     {
         String fullForm = "";

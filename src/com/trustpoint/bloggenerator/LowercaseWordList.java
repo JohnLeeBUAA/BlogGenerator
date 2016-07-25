@@ -20,6 +20,9 @@ public class LowercaseWordList
 {
     public static List<String> lowercaseWordList;
 
+    /**
+     * Initialize the list from text file
+     */
     public static void init()
     {
         Path targetDir = Paths.get(Value.BASE_DIR + Value.SELF_DIR + Value.LOWERCASEWORDLIST_DIR);

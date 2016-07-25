@@ -21,6 +21,9 @@ public class CategoryList
     public static List<String> categoryList;
     public static HashMap<String, Integer> categoryCount;
 
+    /**
+     * Initialize list from text file
+     */
     public static void init()
     {
         Path targetDir = Paths.get(Value.BASE_DIR + Value.SELF_DIR + Value.CATEGORIES_DIR);

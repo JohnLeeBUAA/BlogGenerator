@@ -39,7 +39,7 @@ public class BlogGenerator extends JFrame
         }
         Value.BASE_DIR = currentDir.substring(0, currentDir.length() - Value.SELF_DIR.length());
 
-        // Initialize all resources to be used
+        // Initialize all resources to be used from text files
         AbbrList.init();
         AuthorList.init();
         CategoryList.init();
@@ -49,6 +49,9 @@ public class BlogGenerator extends JFrame
         initUploadFrame();
     }
 
+    /**
+     * Construct GUI for uploading DOCX file
+     */
     private void initUploadFrame()
     {
         uploadFrame = new JFrame(Value.TITLE);
