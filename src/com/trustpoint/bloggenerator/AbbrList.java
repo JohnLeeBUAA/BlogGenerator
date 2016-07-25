@@ -2,10 +2,6 @@ package com.trustpoint.bloggenerator;
 
 import java.util.HashMap;
 
-import javax.naming.spi.DirStateFactory.Result;
-
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * Store a list of all abbreviations used in former blogs
  *

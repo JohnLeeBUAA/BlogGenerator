@@ -10,15 +10,21 @@ import java.util.HashMap;
  */
 public class Abbr
 {
-    public HashMap<String, String> list;
+    private HashMap<String, String> list;
 
     public Abbr()
     {
         list = new HashMap<String, String>();
     }
 
+    public HashMap<String, String> getList()
+    {
+        return list;
+    }
+
     /**
      * Used when parsing
+     *
      * @param shortForm
      */
     public void add(String shortForm)
@@ -28,8 +34,14 @@ public class Abbr
         }
     }
 
+    public void add(String shortForm, String fullForm)
+    {
+        list.put(shortForm, fullForm);
+    }
+
     /**
      * Used in GUI
+     *
      * @param shortForm
      * @param fullForm
      */
@@ -51,8 +63,7 @@ public class Abbr
         if (!list.containsKey(shortForm)) {
             Error error = new Error();
             error.initErrorFrame("Abbreviaton: \"" + shortForm + "\" is not in the list.");
-        }
-        else {
+        } else {
             list.remove(shortForm);
         }
     }
@@ -66,8 +77,7 @@ public class Abbr
     {
         if (list.containsKey(shortForm)) {
             return list.get(shortForm);
-        }
-        else {
+        } else {
             return "";
         }
     }

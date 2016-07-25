@@ -25,17 +25,17 @@ public class Author
 
     public String getName()
     {
-        return name;
+        return this.name;
+    }
+
+    public String getCode()
+    {
+        return this.code;
     }
 
     public void setName(String name)
     {
         this.name = name;
         this.code = AuthorList.getCode(name);
-    }
-
-    public String getCode()
-    {
-        return code;
     }
 }

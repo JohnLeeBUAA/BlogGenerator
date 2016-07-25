@@ -72,23 +72,7 @@ public class BlogGenerator extends JFrame
         uploadDocx.addActionListener(new DocxClickListener());
         panel.add(uploadDocx);
 
-        JButton uploadHtml = new JButton("Edit Existing HTML Blog");
-        uploadHtml.addActionListener(new HtmlClickListener());
-        // TODO: remove this when parsing HTML is implemented
-        uploadHtml.setEnabled(false);
-        panel.add(uploadHtml);
-
         uploadFrame.add(panel);
-
-        JPanel updatePanel = new JPanel(new FlowLayout());
-
-        JButton updateButton = new JButton("Update Resources From Current Blogs");
-        updateButton.addActionListener(new updateButtonListener());
-        // TODO: remove this when updating is implemented
-        updateButton.setEnabled(false);
-        updatePanel.add(updateButton);
-
-        uploadFrame.add(updatePanel);
 
         uploadFrame.setVisible(true);
     }
@@ -107,37 +91,7 @@ public class BlogGenerator extends JFrame
                 File selectedFile = fileChooser.getSelectedFile();
                 Blog blog = new Blog();
                 blog.initFromDocxFile(selectedFile);
-                uploadFrame.dispose();
             }
-        }
-    }
-
-    private class HtmlClickListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            JFileChooser fileChooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("HTML file only", "html");
-            fileChooser.setFileFilter(filter);
-            fileChooser.setAcceptAllFileFilterUsed(false);
-            int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                Blog blog = new Blog();
-                blog.initFromHTMLFile(selectedFile);
-                uploadFrame.dispose();
-            }
-        }
-    }
-
-    private class updateButtonListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            AbbrList.update();
-            AuthorList.update();
-            CategoryList.update();
-            LowercaseWordList.update();
         }
     }
     // ----------- END Action Listeners ----------- //

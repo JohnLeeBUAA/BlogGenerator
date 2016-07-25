@@ -16,15 +16,22 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,6 +40,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xwpf.usermodel.VerticalAlign;
@@ -70,6 +79,8 @@ public class Blog extends JFrame
     private Dimension buttonDimension;
     private Dimension abbrRecordShortDimension;
     private Dimension abbrRecordFullDimension;
+    private List<JTextField> abbrShortList;
+    private List<JTextField> abbrFullList;
 
     // User inputs
     private String oldFileName;
@@ -77,7 +88,9 @@ public class Blog extends JFrame
     private String title;
     private String date;
     private Author author;
-    private String categories;
+    private List<String> categories;
+    private String excerptImg;
+    private String excerptImgAlt;
     private Abbr abbr;
 
     // Parse elements
@@ -98,7 +111,9 @@ public class Blog extends JFrame
         this.title = "";
         this.date = "";
         this.author = new Author();
-        this.categories = "";
+        this.categories = new ArrayList<String>();
+        this.excerptImg = "";
+        this.excerptImgAlt = "";
         this.abbr = new Abbr();
 
         this.paragraphs = new ArrayList<Paragraph>();
@@ -126,11 +141,6 @@ public class Blog extends JFrame
 
         // Display the generated blog in editor
         displayBlog();
-    }
-
-    public void initFromHTMLFile(File file)
-    {
-        // TODO: implement this
     }
 
     /**
@@ -304,13 +314,13 @@ public class Blog extends JFrame
         // Buttons
         JButton uploadImgButton = new JButton("Upload Image");
         uploadImgButton.addActionListener(new UploadImgButtonListener());
-        JButton addImgExcerptButton = new JButton("Add/Change Excerpt Image");
+        JButton addImgExcerptButton = new JButton("Add/Update Excerpt Image");
         addImgExcerptButton.addActionListener(new AddImgExcerptButtonListener());
         buttonPanel1.add(addImgExcerptButton);
         JButton addImgBlogButton = new JButton("Add Image To Blog");
         addImgBlogButton.addActionListener(new AddImgBlogButtonListener());
-        JButton saveButton = new JButton("Save Changes");
-        saveButton.addActionListener(new SaveButtonListener());
+        JButton updateChangesButton = new JButton("Update Changes");
+        updateChangesButton.addActionListener(new UpdateChangesButtonListener());
         JButton writeButton = new JButton("Write to File");
         writeButton.addActionListener(new WriteButtonListener());
 
@@ -318,7 +328,7 @@ public class Blog extends JFrame
         buttonPanel1.add(addImgExcerptButton);
         buttonPanel1.add(addImgBlogButton);
         buttonPanel.add(buttonPanel1);
-        buttonPanel2.add(saveButton);
+        buttonPanel2.add(updateChangesButton);
         buttonPanel2.add(writeButton);
         buttonPanel.add(buttonPanel2);
 
@@ -339,14 +349,18 @@ public class Blog extends JFrame
         abbrPanel.removeAll();
         abbrPanel.setLayout(inputFlowLayout);
 
-        for (Map.Entry<String, String> abbrRecord : abbr.list.entrySet()) {
+        abbrShortList = new ArrayList<JTextField>();
+        abbrFullList = new ArrayList<JTextField>();
+
+        for (Map.Entry<String, String> abbrRecord : abbr.getList().entrySet()) {
             JTextField abbrRecordShort = new JTextField(abbrRecord.getKey());
             abbrRecordShort.setPreferredSize(abbrRecordShortDimension);
             abbrRecordShort.setEditable(false);
+            abbrShortList.add(abbrRecordShort);
 
             JTextField abbrRecordFull = new JTextField(abbrRecord.getValue());
             abbrRecordFull.setPreferredSize(abbrRecordFullDimension);
-            abbrRecordFull.setEditable(false);
+            abbrFullList.add(abbrRecordFull);
 
             JButton deleteAbbrButton = new JButton("Delete Abbr");
             deleteAbbrButton.setPreferredSize(buttonDimension);
@@ -534,7 +548,12 @@ public class Blog extends JFrame
                 setRunTags(tempRuns.get(i - 1), tempRuns.get(i));
             }
             if (currentRun.toString() != null) {
-                newRun.text = currentRun.toString();
+                if (currentParagraphStyle.equals(Value.PARAGRAPH_STYLE_HEADER)) {
+                    newRun.text = capitalize(currentRun.toString());
+                }
+                else {
+                    newRun.text = currentRun.toString();
+                }
             }
             updateRunStyle();
         }
@@ -721,7 +740,7 @@ public class Blog extends JFrame
                     int abbrIndex = tempRun.text.length();
                     String abbrToAdd = "";
                     // Get the first abbr in text
-                    for (Map.Entry<String, String> abbrRecord : abbr.list.entrySet()) {
+                    for (Map.Entry<String, String> abbrRecord : abbr.getList().entrySet()) {
                         int pos = originalRunText.indexOf(abbrRecord.getKey());
                         if (pos != -1 && pos < abbrIndex) {
                             abbrIndex = pos;
@@ -760,6 +779,8 @@ public class Blog extends JFrame
      */
     private void getCategoriesInput()
     {
+        categories.clear();
+
         for (Map.Entry<String, Integer> catRecord : CategoryList.categoryCount.entrySet()) {
             catRecord.setValue(0);
         }
@@ -775,16 +796,14 @@ public class Blog extends JFrame
             }
         }
 
-        String result = "";
         for (Map.Entry<String, Integer> catRecord : CategoryList.categoryCount.entrySet()) {
-            if (catRecord.getValue() > 0) {
-                result += catRecord.getKey() + " ";
+            if (catRecord.getValue() > 0 && !categories.contains(catRecord.getKey())) {
+                categories.add(catRecord.getKey());
             }
         }
-        result = result.trim();
 
-        categoriesInput.setText(result);
-        categories = result;
+        Collections.sort(categories);
+        categoriesInput.setText(StringUtils.join(categories, " "));
     }
 
     /**
@@ -903,18 +922,44 @@ public class Blog extends JFrame
         editor.append(Value.HEADER_TITLE + title + "\n");
         editor.append(Value.HEADER_DATE + date + Value.HEADER_TIME + "\n");
         editor.append(Value.HEADER_AUTHOR + author.getCode() + "\n");
-        editor.append(Value.HEADER_CATEGORIES + categories + "\n");
+        editor.append(Value.HEADER_CATEGORIES + StringUtils.join(categories, " ") + "\n");
         editor.append(Value.HEADER_EXCERPT + "\n");
-        for (int i = 0; i < excerptLines.size(); i++) {
+        for (int i = 0; i < excerptLines.size() - 1; i++) {
             editor.append(excerptLines.get(i) + "\n");
         }
+
+        // Insert the "&hellip;" char in the last line of excerpt
+        String excerptLastLine = excerptLines.get(excerptLines.size() - 1);
+        if ((excerptLastLine.length() + Value.HTML_CHAR_HELLIP.length() + 1) > Value.LINE_LENGTH) {
+            editor.append(excerptLastLine.substring(0,
+                    excerptLastLine.length() - Value.HTML_PATAGRAPH_CLOSE.length()) + "\n");
+            editor.append(Value.HTML_CHAR_HELLIP + Value.HTML_PATAGRAPH_CLOSE);
+        } else {
+            editor.append(excerptLastLine.substring(0,
+                    excerptLastLine.length() - Value.HTML_PATAGRAPH_CLOSE.length()) + " "
+                    + Value.HTML_CHAR_HELLIP + Value.HTML_PATAGRAPH_CLOSE + "\n");
+        }
+
+        if (!excerptImg.equals("") && !excerptImgAlt.equals("")) {
+            editor.append(Value.HEADER_IMAGE + excerptImg + "\n");
+            editor.append(Value.HEADER_IMAGE_ALT + excerptImgAlt + "\n");
+        }
         editor.append(Value.HEADER_END + "\n");
-        // TODO: all hellips tag here
 
         // Add blog content
         for (int i = 0; i < paragraphs.size(); i++) {
-            List<String> lines = displayParagraph("", Value.LINE_LENGTH, paragraphs.get(i));
-            editor.append("\n");
+            if (!(paragraphs.get(i).openTag.equals("")
+                    || paragraphs.get(i).openTag.equals(Value.HTML_LIST_OPEN))) {
+                editor.append("\n");
+            }
+
+            List<String> lines;
+            if (paragraphs.get(i).openTag.equals(Value.HTML_LIST_OPEN)) {
+                lines = displayParagraph(Value.LINE_PREFIX, Value.LINE_LENGTH, paragraphs.get(i));
+            } else {
+                lines = displayParagraph("", Value.LINE_LENGTH, paragraphs.get(i));
+            }
+
             for (int j = 0; j < lines.size(); j++) {
                 editor.append(lines.get(j) + "\n");
             }
@@ -980,8 +1025,7 @@ public class Blog extends JFrame
                         line = lineRemain + wordList[k];
                         tagOnly = false;
                         breakPoint = -1;
-                    }
-                    else {
+                    } else {
                         line += wordList[k];
                     }
                 }
@@ -1013,8 +1057,7 @@ public class Blog extends JFrame
                 }
             }
         }
-        if ((line.length() + paragraph.closeTag.length()) > contentLength
-                && breakPoint != -1) {
+        if ((line.length() + paragraph.closeTag.length()) > contentLength && breakPoint != -1) {
             String lineToAdd = line.substring(0, breakPoint);
             String lineRemain = line.substring(breakPoint).trim();
             result.add(prefix + lineToAdd);
@@ -1025,6 +1068,85 @@ public class Blog extends JFrame
         result.add(prefix + line);
         return result;
     }
+
+    /**
+     * Validate and get user's inputs
+     *
+     * @return
+     */
+    private boolean validateAndGetInput()
+    {
+        if (StringUtils.isBlank(fileNameInput.getText())) {
+            Error error = new Error();
+            error.initErrorFrame("File name cannot be blank.");
+            return false;
+        } else {
+            this.fileName = fileNameInput.getText();
+        }
+
+        if (StringUtils.isBlank(titleInput.getText())) {
+            Error error = new Error();
+            error.initErrorFrame("Title cannot be blank.");
+            return false;
+        } else {
+            this.title = titleInput.getText();
+        }
+
+        if (StringUtils.isBlank(dateInput.getText())) {
+            Error error = new Error();
+            error.initErrorFrame("Date cannot be blank.");
+            return false;
+        } else {
+            this.date = dateInput.getText();
+        }
+
+        if (StringUtils.isBlank(authorInput.getSelectedItem().toString())) {
+            Error error = new Error();
+            error.initErrorFrame("Author cannot be blank.");
+            return false;
+        } else {
+            this.author.setName(authorInput.getSelectedItem().toString());
+        }
+
+        if (StringUtils.isBlank(categoriesInput.getText())) {
+            Error error = new Error();
+            error.initErrorFrame("Categories cannot be blank.");
+            return false;
+        } else {
+            this.categories.clear();
+            this.categories.addAll(Arrays.asList(StringUtils.split(categoriesInput.getText())));
+            Collections.sort(categories);
+        }
+
+        for (int i = 0; i < abbrShortList.size(); i++) {
+            String shortForm = abbrShortList.get(i).getText();
+            String fullForm = abbrFullList.get(i).getText();
+            if (StringUtils.isBlank(shortForm) || StringUtils.isBlank(fullForm)) {
+                Error error = new Error();
+                error.initErrorFrame("Abbreviation cannot be blank.");
+                return false;
+            } else {
+                this.abbr.add(shortForm, fullForm);
+            }
+        }
+
+        return true;
+    }
+
+    private String getImaAlt(String imgName)
+    {
+        String result = imgName;
+        int extPos = result.lastIndexOf('.');
+        if (extPos != -1) {
+            result = result.substring(0, extPos);
+        }
+        result = result.replaceAll("[^A-Za-z0-9]", " ");
+        result = result.replaceAll("\\s+", " ");
+        result = StringUtils.trim(result);
+        return capitalize(result);
+    }
+
+    // ---------- START Methods used by listeners ---------- //
 
     /**
      * Update line number if content in editor changes
@@ -1063,20 +1185,20 @@ public class Blog extends JFrame
     private void addCategory()
     {
         String input = categoryList.getSelectedItem().toString();
-        if (input.equals("")) {
+        if (StringUtils.isBlank(input)) {
             Error error = new Error();
             error.initErrorFrame("Please choose a category to add.");
         } else {
-            categories = categoriesInput.getText();
-            if (categories.equals("")) {
-                categories = input;
-            } else if (categories.contains(input)) {
+            categories.clear();
+            categories.addAll(Arrays.asList(StringUtils.split(categoriesInput.getText())));
+            if (categories.contains(input)) {
                 Error error = new Error();
                 error.initErrorFrame("Category: \"" + input + "\" has already been added.");
             } else {
-                categories += " " + input;
+                categories.add(input);
             }
-            categoriesInput.setText(categories);
+            Collections.sort(categories);
+            categoriesInput.setText(StringUtils.join(categories, " "));
         }
         categoryList.setSelectedIndex(0);
     }
@@ -1088,7 +1210,7 @@ public class Blog extends JFrame
     {
         String inputShortForm = addAbbrInputShort.getText();
         String inputFullForm = addAbbrInputFull.getText();
-        if (inputShortForm.equals("")) {
+        if (StringUtils.isBlank(inputShortForm)) {
             Error error = new Error();
             error.initErrorFrame("The short form of an abbreviation cannot be empty.");
         } else {
@@ -1112,28 +1234,99 @@ public class Blog extends JFrame
 
     private void uploadImg()
     {
-
+        // TODO: replace this
+        // Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
+        Path targetDir = Paths.get("/Users/zli/Documents");
+        if (Files.exists(targetDir) && Files.isDirectory(targetDir)) {
+            JFileChooser fileChooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Image only", "jpg", "png",
+                    "gif");
+            fileChooser.setFileFilter(filter);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                Path copyTo = Paths.get(targetDir.toString() + "/" + selectedFile.getName());
+                if (Files.exists(copyTo)) {
+                    Error error = new Error();
+                    error.initErrorFrame(selectedFile.getName() + " already exists.");
+                } else {
+                    try {
+                        Files.copy(selectedFile.toPath(), copyTo);
+                    } catch (IOException e) {
+                        Error error = new Error();
+                        error.initErrorFrame("Exception copying file: " + e.toString());
+                    }
+                }
+            }
+        } else {
+            Error error = new Error();
+            error.initErrorFrame(targetDir.toString() + " does not exists.");
+        }
     }
 
     private void addImgBlog()
     {
-
+        // TODO: replace this
+        // Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
+        Path targetDir = Paths.get("/Users/zli/Documents");
+        if (Files.exists(targetDir) && Files.isDirectory(targetDir)) {
+            JFileChooser fileChooser = new JFileChooser(targetDir.toFile());
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Image only", "jpg", "png",
+                    "gif");
+            fileChooser.setFileFilter(filter);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                String imgSrc = Value.IMAGE_DIR + "/" + selectedFile.getName();
+                String imgAlt = getImaAlt(selectedFile.getName());
+                editor.insert("\n" + Value.HTML_IMAGE(imgSrc, imgAlt) + "\n",
+                        editor.getCaretPosition());
+            }
+        } else {
+            Error error = new Error();
+            error.initErrorFrame(targetDir.toString() + " does not exists.");
+        }
     }
 
     private void addImgExcerpt()
     {
-
+        // TODO: replace this
+        // Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
+        Path targetDir = Paths.get("/Users/zli/Documents");
+        if (Files.exists(targetDir) && Files.isDirectory(targetDir)) {
+            JFileChooser fileChooser = new JFileChooser(targetDir.toFile());
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Image only", "jpg", "png",
+                    "gif");
+            fileChooser.setFileFilter(filter);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                excerptImg = Value.IMAGE_DIR + "/" + selectedFile.getName();
+                excerptImgAlt = getImaAlt(selectedFile.getName());
+                displayBlog();
+            }
+        } else {
+            Error error = new Error();
+            error.initErrorFrame(targetDir.toString() + " does not exists.");
+        }
     }
 
-    private void save()
+    private void updateChanges()
     {
-
+        if (validateAndGetInput()) {
+            setAbbrInput();
+            displayBlog();
+        }
     }
 
     private void write()
     {
 
     }
+    // ----------- END Methods used by listeners ----------- //
 
     // ---------- START Private Classes and Action Listeners ---------- //
 
@@ -1201,6 +1394,7 @@ public class Blog extends JFrame
         @Override
         public void paintComponent(Graphics g)
         {
+            // Draw a red vertical ruler at line length
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
             g2.setColor(Color.RED);
@@ -1283,11 +1477,11 @@ public class Blog extends JFrame
         }
     }
 
-    private class SaveButtonListener implements ActionListener
+    private class UpdateChangesButtonListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
         {
-            save();
+            updateChanges();
         }
     }
 

@@ -80,7 +80,7 @@ public class Value
 
     public static String HTML_IMAGE(String src, String alt)
     {
-        return "<figure><img src=\"" + src + "\" alt=\"" + alt + "\"/><figure>";
+        return "<figure><img src=\"" + src + "\" alt=\"" + alt + "\"/></figure>";
     }
 
     // HTML chars
