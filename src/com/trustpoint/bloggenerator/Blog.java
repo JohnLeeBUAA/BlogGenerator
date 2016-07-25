@@ -41,7 +41,6 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.filechooser.FileSystemView;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xwpf.usermodel.VerticalAlign;
@@ -1234,9 +1233,7 @@ public class Blog extends JFrame
 
     private void uploadImg()
     {
-        // TODO: replace this
-        // Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
-        Path targetDir = Paths.get("/Users/zli/Documents");
+        Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
         if (Files.exists(targetDir) && Files.isDirectory(targetDir)) {
             JFileChooser fileChooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Image only", "jpg", "png",
@@ -1267,9 +1264,7 @@ public class Blog extends JFrame
 
     private void addImgBlog()
     {
-        // TODO: replace this
-        // Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
-        Path targetDir = Paths.get("/Users/zli/Documents");
+        Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
         if (Files.exists(targetDir) && Files.isDirectory(targetDir)) {
             JFileChooser fileChooser = new JFileChooser(targetDir.toFile());
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Image only", "jpg", "png",
@@ -1292,9 +1287,7 @@ public class Blog extends JFrame
 
     private void addImgExcerpt()
     {
-        // TODO: replace this
-        // Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
-        Path targetDir = Paths.get("/Users/zli/Documents");
+        Path targetDir = Paths.get(Value.BASE_DIR + Value.IMAGE_SOURCE_DIR);
         if (Files.exists(targetDir) && Files.isDirectory(targetDir)) {
             JFileChooser fileChooser = new JFileChooser(targetDir.toFile());
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Image only", "jpg", "png",

@@ -1,6 +1,12 @@
 package com.trustpoint.bloggenerator;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,25 +23,30 @@ public class CategoryList
 
     public static void init()
     {
-        // TODO: init list from text file
+        Path targetDir = Paths.get(Value.BASE_DIR + Value.SELF_DIR + Value.CATEGORIES_DIR);
+        if (Files.exists(targetDir)) {
+            categoryList = new ArrayList<String>();
+            categoryCount = new HashMap<String, Integer>();
 
-        categoryList = new ArrayList<String>();
-        categoryCount = new HashMap<String, Integer>();
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(targetDir.toFile()));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    categoryList.add(line);
+                    categoryCount.put(line, 0);
+                }
+                br.close();
 
-        categoryList.add("");
-
-        categoryList.add("iot");
-        categoryCount.put("iot", 0);
-        categoryList.add("security");
-        categoryCount.put("security", 0);
-        categoryList.add("test");
-        categoryCount.put("test", 0);
-        categoryList.add("anothertest");
-        categoryCount.put("anothertest", 0);
-    }
-
-    public static void update()
-    {
-        // TODO: update text file resources from existing blogs
+                Collections.sort(categoryList);
+                categoryList.add(0, "");
+            } catch (Exception e) {
+                Error error = new Error();
+                error.initErrorFrame(
+                        "Exception reading file: " + targetDir.toString() + ", " + e.toString());
+            }
+        } else {
+            Error error = new Error();
+            error.initErrorFrame(targetDir.toString() + " does not exists.");
+        }
     }
 }

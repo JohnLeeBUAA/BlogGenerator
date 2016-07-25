@@ -1,0 +1,30 @@
+IoT:Internet of Things
+IT:Information Technology
+UW:University of Waterloo
+WOW:Women of Waterloo Region
+CEO:Chief Executive Officer
+M2M:Machine-to-Machine
+V2V:Vehicle-to-Vehicle
+U.S.:United States
+NHTSA:National Highway Traffic Safety Administration
+V2X:Vehicle-to-X
+NFC:Near Field Communication
+RFID:Radio-Frequency Identification
+PIN:Personal Identification Number
+ID:Identifier
+APMA:Automotive Parts Manufacturer's Association
+SKU:Stock Keeping Unit
+ITS:Intelligent Transportation Systems
+SCMS:Security Credential Management System
+US:United States
+SMS:Short Message Service
+MIT:Massachusetts Institute of Technology
+SoC:System on Chip
+IP:Internet Protocol
+UK:United Kingdom
+ECC:Elliptic Curve Cryptography
+NIST:National Institute of Standards and Technology
+ETSI:European Telecommunications Standards Institute
+IEEE:Institute of Electrical and Electronics Engineers
+FBI:Federal Bureau of Investigation
+MaaS:Mobility-as-a-Service
