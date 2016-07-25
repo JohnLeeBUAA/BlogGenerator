@@ -14,6 +14,7 @@ public class Value
 
     public static final String RELATIVE_DIR = "/website/BlogGenerator";
     public static final String SELF_DIR = "/BlogGenerator";
+    public static final String BLOG_DIR = "/src/www/_posts";
     public static final String AUTHORS_DIR = "/Authors.txt";
     public static final String CATEGORIES_DIR = "/Categories.txt";
     public static final String ABBR_DIR = "/Abbr.txt";
@@ -21,6 +22,7 @@ public class Value
     public static final String IMAGE_SOURCE_DIR = "/src/www/img/blog-articles";
     public static final String IMAGE_DIR = "/img/blog-articles";
     public static final String GOOGLE_SEARCH_URL = "https://www.google.ca/search?q=";
+    public static final String GOOGLE_SEARCH_ANCHOR = " - Wikipedia, the free encyclopedia";
 
     // GUI values
     public static final String TITLE = "Blog Generator";

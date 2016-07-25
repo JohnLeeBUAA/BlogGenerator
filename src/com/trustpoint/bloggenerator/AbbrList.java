@@ -66,7 +66,16 @@ public class AbbrList
             BufferedReader br = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
             String input;
             while ((input = br.readLine()) != null) {
-                // TODO: Get the full form of abbr in html
+                if (input.contains(Value.GOOGLE_SEARCH_ANCHOR)) {
+                    int lastPos = input.indexOf(Value.GOOGLE_SEARCH_ANCHOR);
+                    int firstPos = input.lastIndexOf('>', lastPos) + 1;
+                    if (firstPos == lastPos) {
+                        lastPos = input.lastIndexOf('<', lastPos);
+                        firstPos = input.lastIndexOf(">", lastPos) + 1;
+                    }
+                    fullForm = input.substring(firstPos, lastPos);
+                    break;
+                }
             }
             br.close();
         } catch (Exception e) {
@@ -74,7 +83,6 @@ public class AbbrList
             error.initErrorFrame("Exception getting Google search result of \"" + abbr + "\".\n"
                     + e.getMessage());
         }
-        return fullForm;
+        return LowercaseWordList.capitalize(fullForm.trim());
     }
-
 }

@@ -17,6 +17,7 @@ import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,7 +74,6 @@ public class Blog extends JFrame
     private JTextField addAbbrInputShort;
     private JTextField addAbbrInputFull;
 
-    private FlowLayout inputFlowLayout;
     private JPanel abbrPanel;
     private Dimension buttonDimension;
     private Dimension abbrRecordShortDimension;
@@ -189,7 +189,7 @@ public class Blog extends JFrame
         // ----------START inputPanel---------- //
         JPanel inputPanel = new JPanel(new GridLayout(8, 1));
 
-        inputFlowLayout = new FlowLayout(FlowLayout.LEFT);
+        FlowLayout inputFlowLayout = new FlowLayout(FlowLayout.LEFT);
         inputFlowLayout.setHgap(Value.FLOWLAYOUT_GAP);
 
         JPanel inputPanel1 = new JPanel(inputFlowLayout);
@@ -303,33 +303,22 @@ public class Blog extends JFrame
 
         // The button panel on the bottom right side of the frame
         // ----------START bottonPanel---------- //
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 1));
-
-        FlowLayout buttonFlowLayout = new FlowLayout(FlowLayout.CENTER);
-
-        JPanel buttonPanel1 = new JPanel(buttonFlowLayout);
-        JPanel buttonPanel2 = new JPanel(buttonFlowLayout);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         // Buttons
         JButton uploadImgButton = new JButton("Upload Image");
         uploadImgButton.addActionListener(new UploadImgButtonListener());
         JButton addImgExcerptButton = new JButton("Add/Update Excerpt Image");
         addImgExcerptButton.addActionListener(new AddImgExcerptButtonListener());
-        buttonPanel1.add(addImgExcerptButton);
         JButton addImgBlogButton = new JButton("Add Image To Blog");
         addImgBlogButton.addActionListener(new AddImgBlogButtonListener());
-        JButton updateChangesButton = new JButton("Update Changes");
-        updateChangesButton.addActionListener(new UpdateChangesButtonListener());
         JButton writeButton = new JButton("Write to File");
         writeButton.addActionListener(new WriteButtonListener());
 
-        buttonPanel1.add(uploadImgButton);
-        buttonPanel1.add(addImgExcerptButton);
-        buttonPanel1.add(addImgBlogButton);
-        buttonPanel.add(buttonPanel1);
-        buttonPanel2.add(updateChangesButton);
-        buttonPanel2.add(writeButton);
-        buttonPanel.add(buttonPanel2);
+        buttonPanel.add(uploadImgButton);
+        buttonPanel.add(addImgExcerptButton);
+        buttonPanel.add(addImgBlogButton);
+        buttonPanel.add(writeButton);
 
         operationPanel.add(buttonPanel, BorderLayout.PAGE_END);
         // -----------END buttonPanel----------- //
@@ -346,7 +335,10 @@ public class Blog extends JFrame
     private void initAbbrPanel()
     {
         abbrPanel.removeAll();
-        abbrPanel.setLayout(inputFlowLayout);
+
+        FlowLayout abbrFlowLayout = new FlowLayout(FlowLayout.CENTER);
+        abbrFlowLayout.setHgap(Value.FLOWLAYOUT_GAP);
+        abbrPanel.setLayout(abbrFlowLayout);
 
         abbrShortList = new ArrayList<JTextField>();
         abbrFullList = new ArrayList<JTextField>();
@@ -382,6 +374,16 @@ public class Blog extends JFrame
                 abbrPanel.add(emptyLabel);
             }
         }
+
+        // Add an empty line
+        JLabel emptyLabel = new JLabel(" ");
+        emptyLabel.setPreferredSize(
+                new Dimension(blogFrame.getSize().width / 2 - Value.FLOWLAYOUT_GAP,
+                        emptyLabel.getPreferredSize().height));
+        abbrPanel.add(emptyLabel);
+        JButton updateButton = new JButton("Update Changes");
+        updateButton.addActionListener(new UpdateButtonListener());
+        abbrPanel.add(updateButton);
 
         blogFrame.revalidate();
         blogFrame.repaint();
@@ -548,9 +550,8 @@ public class Blog extends JFrame
             }
             if (currentRun.toString() != null) {
                 if (currentParagraphStyle.equals(Value.PARAGRAPH_STYLE_HEADER)) {
-                    newRun.text = capitalize(currentRun.toString());
-                }
-                else {
+                    newRun.text = LowercaseWordList.capitalize(currentRun.toString());
+                } else {
                     newRun.text = currentRun.toString();
                 }
             }
@@ -819,35 +820,7 @@ public class Blog extends JFrame
         }
         docxFileName = docxFileName.replaceAll("\\s+", " ");
         docxFileName = StringUtils.trim(docxFileName);
-        return capitalize(docxFileName);
-    }
-
-    /**
-     * Capitalize the first letter in words in given string if the word in not in LowercaseWordList
-     *
-     * @param str
-     *            The String containing words
-     * @return Capitalized string
-     */
-    private String capitalize(String str)
-    {
-        String result = "";
-        if (!StringUtils.isBlank(str)) {
-            if (str.charAt(0) == ' ') {
-                result += " ";
-            }
-            String[] list = StringUtils.split(str);
-            for (int i = 0; i < list.length; i++) {
-                if (!LowercaseWordList.lowercaseWordList.contains(list[i])) {
-                    list[i] = list[i].substring(0, 1).toUpperCase() + list[i].substring(1);
-                }
-                result += list[i] + " ";
-            }
-            if (str.charAt(str.length() - 1) != ' ') {
-                result = StringUtils.stripEnd(result, " ");
-            }
-        }
-        return result;
+        return LowercaseWordList.capitalize(docxFileName);
     }
 
     /**
@@ -918,6 +891,7 @@ public class Blog extends JFrame
 
         // Add header
         editor.append(Value.HEADER_START + "\n");
+        editor.append(Value.HEADER_LAYOUT + "\n");
         editor.append(Value.HEADER_TITLE + title + "\n");
         editor.append(Value.HEADER_DATE + date + Value.HEADER_TIME + "\n");
         editor.append(Value.HEADER_AUTHOR + author.getCode() + "\n");
@@ -1142,7 +1116,7 @@ public class Blog extends JFrame
         result = result.replaceAll("[^A-Za-z0-9]", " ");
         result = result.replaceAll("\\s+", " ");
         result = StringUtils.trim(result);
-        return capitalize(result);
+        return LowercaseWordList.capitalize(result);
     }
 
     // ---------- START Methods used by listeners ---------- //
@@ -1307,7 +1281,7 @@ public class Blog extends JFrame
         }
     }
 
-    private void updateChanges()
+    private void update()
     {
         if (validateAndGetInput()) {
             setAbbrInput();
@@ -1317,6 +1291,30 @@ public class Blog extends JFrame
 
     private void write()
     {
+        Path targetDir = Paths.get(Value.BASE_DIR + Value.BLOG_DIR);
+        if (Files.exists(targetDir) && Files.isDirectory(targetDir)) {
+            try {
+                if (!oldFileName.equals("") && !oldFileName.equals(fileName)) {
+                    Path oldFileDir = Paths.get(targetDir.toString() + "/" + oldFileName);
+                    if (Files.exists(oldFileDir)) {
+                        Files.delete(oldFileDir);
+                    }
+                }
+                Path newFileDir = Paths.get(targetDir.toString() + "/" + fileName);
+                if (Files.exists(newFileDir)) {
+                    Files.delete(newFileDir);
+                }
+                Files.write(newFileDir, Arrays.asList(editor.getText().split("\n")),
+                        Charset.forName("UTF-8"));
+                oldFileName = fileName;
+            } catch (Exception e) {
+                Error error = new Error();
+                error.initErrorFrame("Exception writing to file.");
+            }
+        } else {
+            Error error = new Error();
+            error.initErrorFrame(targetDir.toString() + " does not exists.");
+        }
 
     }
     // ----------- END Methods used by listeners ----------- //
@@ -1470,11 +1468,11 @@ public class Blog extends JFrame
         }
     }
 
-    private class UpdateChangesButtonListener implements ActionListener
+    private class UpdateButtonListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
         {
-            updateChanges();
+            update();
         }
     }
 
