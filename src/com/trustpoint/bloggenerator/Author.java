@@ -1,41 +1,48 @@
 package com.trustpoint.bloggenerator;
 
 /**
- * Handle a single author
+ * Handle a single author.
  *
  * @author zli
  *
  */
-public class Author
-{
-    private String name;
-    private String code;
+public class Author {
+  private String name;
+  private String code;
 
-    public Author()
-    {
-        this.name = "";
-        this.code = "";
-    }
+  /**
+   * Constructor.
+   */
+  public Author() {
+    this.name = "";
+    this.code = "";
+  }
 
-    public Author(String name)
-    {
-        this.name = name;
-        this.code = AuthorList.getCode(name);
-    }
+  /**
+   * Getter of name.
+   *
+   * @return Name of author.
+   */
+  public String getName() {
+    return this.name;
+  }
 
-    public String getName()
-    {
-        return this.name;
-    }
+  /**
+   * Getter of code.
+   *
+   * @return Name code of author.
+   */
+  public String getCode() {
+    return this.code;
+  }
 
-    public String getCode()
-    {
-        return this.code;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-        this.code = AuthorList.getCode(name);
-    }
+  /**
+   * Set the name and name code of author.
+   *
+   * @param name Name of author.
+   */
+  public void setName(String name) {
+    this.name = name;
+    this.code = AuthorList.getCode(name);
+  }
 }
